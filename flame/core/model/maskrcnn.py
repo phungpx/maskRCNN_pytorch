@@ -93,7 +93,9 @@ class MaskrcnnMobileNetV2(nn.Module):
         mobilenetv2_backbone[-1] = torchvision.models.mobilenet.ConvBNReLU(320, backbone_out_channels)
         mobilenetv2_backbone.out_channels = backbone_out_channels
         anchor_generator = AnchorGenerator(sizes=anchor_sizes, aspect_ratios=anchor_aspect_ratios)
-        roi_align = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0'], output_size=roi_output_size, sampling_ratio=roi_sampling_ratio)
+        roi_align = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0'],
+                                                       output_size=roi_output_size,
+                                                       sampling_ratio=roi_sampling_ratio)
         model = MaskRCNN(backbone=mobilenetv2_backbone,
                          num_classes=num_classes,
                          rpn_anchor_generator=anchor_generator,

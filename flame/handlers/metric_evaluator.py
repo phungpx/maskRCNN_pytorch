@@ -1,6 +1,4 @@
-from ..core.engine.torchvision_engine import Evaluator
-# from ..core.engine.yolov3_engine import Evaluator
-# from ..core.engine.efficientdet_engine import Evaluator
+from ..core.engine.engine import Evaluator
 from ignite.engine import Events
 
 

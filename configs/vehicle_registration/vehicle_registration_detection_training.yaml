@@ -76,15 +76,11 @@ data:
 
 model:
   module: flame.core.model.maskrcnn
-  class: MaskrcnnMobileNetV2
-  MaskrcnnMobileNetV2:
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
     num_classes: 5
-    backbone_pretrained: True
-    backbone_out_channels: 256
-    anchor_sizes: ((32, 64, 128, 256, 512),)
-    anchor_aspect_ratios: ((0.5, 1.0, 2.0),)
-    roi_output_size: 7
-    roi_sampling_ratio: 2
+    pretrained: True
+    pretrained_backbone: False
 
 optim:
   module: torch.optim
@@ -115,7 +111,7 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.mAP
+        module: flame.handlers.metrics.metric_fn.mAP
         class: mAP
         mAP:
           num_classes: 5
