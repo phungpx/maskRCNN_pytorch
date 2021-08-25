@@ -1,0 +1,90 @@
+data:
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: flame.core.data.maskrcnn_ekycs_dataset
+        class: EkycsDataset
+        EkycsDataset:
+          dirname: '''dataset/car_inspec_segmentation/test/'''
+          classes:
+            DKIX_COVER_1: 1
+            DKIX_COVER_2: 2
+            DKIX_CONTENT_1: 3
+            DKIX_CONTENT_2: 4
+          image_size: (800, 800)
+          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
+          label_patterns: ['''*.json''']
+      batch_size: 32
+      shuffle: False
+      collate_fn: 'lambda batch:tuple(zip(*batch))'
+
+model:
+  module: flame.core.model.maskrcnn_torchvision
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
+    num_classes: 5
+    pretrained: False
+    pretrained_backbone: False
+
+metrics:
+  module: flame.handlers.metrics.metrics
+  class: Metrics
+  Metrics:
+    metrics:
+      mAP:
+        module: flame.handlers.metrics.mAP
+        class: mAP
+        mAP:
+          num_classes: 5
+          iou_threshold: 0.5
+          box_format: '''corners'''
+          output_transform: 'lambda x: (x[0], x[1])'
+    attach_to:
+      engine: '''test'''
+
+screenlogger:
+  module: flame.handlers.screenlogger
+  class: ScreenLogger
+  ScreenLogger:
+    eval_names:
+      - '''test'''
+
+checkpoint_loader:
+  module: flame.handlers.checkpoint
+  class: CheckpointLoader
+  CheckpointLoader:
+    checkpoint_path: '''checkpoint/CAR_INSPEC/maskrcnn_resnet50fpn/2105261342/best_model_9_mAP=0.9931.pt'''
+    mode: '''test'''
+
+predictor:
+  module: flame.handlers.predictor
+  class: RegionPredictor
+  RegionPredictor:
+    evaluator_name: '''engine'''
+    output_dir: '''checkpoint/CAR_INSPEC/maskrcnn_resnet50fpn/2105261342/best_model_9_mAP=0.9931/test'''
+    output_img_ext: '''.jpg'''
+    output_mask_ext: '''.png'''
+    classes:
+      # page: [[0, 255, 0], 1]
+      DKIX_COVER_1: [[0, 255, 0], 1]
+      DKIX_COVER_2: [[0, 0, 255], 2]
+      DKIX_CONTENT_1: [[0, 255, 255], 3]
+      DKIX_CONTENT_2: [[255, 255, 0], 4]
+    image_size: (800, 800)
+    thresh_score: 0.8
+    thresh_iou_nms: 0.4
+    use_pad_to_square: True
+    ratio_color_mask_on_image: 0.3
+    output_transform: 'lambda x: (x[0], x[-1])'
+
+engine:
+  module: flame.core.engine.engine
+  class: Evaluator
+  Evaluator:
+    dataset: config['data']['test']
+    device: '''cuda'''
+
+extralibs:
+  torch: torch

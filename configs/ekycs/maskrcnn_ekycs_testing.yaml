@@ -1,0 +1,151 @@
+data:
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: flame.core.data.maskrcnn_ekycs_dataset
+        class: EkycsDataset
+        EkycsDataset:
+          dirname: '''dataset/EKYCs/test'''
+          classes:
+            # BLX: 1
+            # BLX_BACK: 2
+            # BLX_OLD: 3
+            # BLX_BACK_OLD: 4
+            # CMND: 5
+            # CMND_BACK: 6
+            # CCCD: 7
+            # CCCD_BACK: 8
+            # CMCC: 9
+            # CCCD_front_chip: 10
+            # CCCD_back_chip: 11
+            # CMQD_A: 12
+            # CMQD_A_BACK: 13
+            # CMQD_B: 14
+            # CMQD_B_BACK: 15
+            # CMQD_C: 16
+            # CMQD_C_BACK: 17
+            # CMQD_D: 18
+            # CMQD_D_BACK: 19
+            # CMQD_B_VT: 20
+            # CMQD_B_VT_BACK: 21
+            # PASSPORT: 22
+            # PASSPORT_OTHER: 23
+            BLX: 1
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
+          image_size: (800, 800)
+          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
+          label_patterns: ['''*.xml''']
+      batch_size: 32
+      shuffle: False
+      collate_fn: 'lambda batch:tuple(zip(*batch))'
+
+model:
+  module: flame.core.model.maskrcnn_torchvision
+  class: MaskrcnnMobileNetV3
+  MaskrcnnMobileNetV3:
+    num_classes: 2
+    pretrained: False
+    pretrained_backbone: False
+
+metrics:
+  module: flame.handlers.metrics.metrics
+  class: Metrics
+  Metrics:
+    metrics:
+      mAP:
+        module: flame.handlers.metrics.mAP
+        class: mAP
+        mAP:
+          num_classes: 2
+          iou_threshold: 0.5
+          box_format: '''corners'''
+          output_transform: 'lambda x: (x[0], x[1])'
+    attach_to:
+      engine: '''test'''
+
+screenlogger:
+  module: flame.handlers.screenlogger
+  class: ScreenLogger
+  ScreenLogger:
+    eval_names:
+      - '''test'''
+
+checkpoint_loader:
+  module: flame.handlers.checkpoint
+  class: CheckpointLoader
+  CheckpointLoader:
+    checkpoint_path: '''checkpoint/EKYCs/maskrcnn_mobilenetv3/2104300726/best_model_18_mAP=0.9985.pt'''
+    mode: '''test'''
+
+predictor:
+  module: flame.handlers.predictor
+  class: RegionPredictor
+  RegionPredictor:
+    evaluator_name: '''engine'''
+    output_dir: '''checkpoint/EKYCs/maskrcnn_mobilenetv3/2104300726/best_model_18_mAP=0.9985/test'''
+    output_img_ext: '''.jpg'''
+    output_mask_ext: '''.png'''
+    classes:
+      card: [[0, 255, 0], 1]
+      # BLX: [[0, 255, 0], 1]
+      # BLX_BACK: [[255, 255, 0], 2]
+      # BLX_OLD: [[0, 255, 255], 3]
+      # BLX_BACK_OLD: [[255, 0, 0], 4]
+      # CMND: [[0, 0, 255], 5]
+      # CMND_BACK: [[140, 255, 0], 6]
+      # CCCD: [[0, 255, 140], 7]
+      # CCCD_BACK: [[140, 0, 255], 8]
+      # CMCC: [[0, 255, 200], 9]
+      # CCCD_front_chip: [[200, 255, 0], 10]
+      # CCCD_back_chip: [[0, 200, 100], 11]
+      # CMQD_A: [[100, 0, 100], 12]
+      # CMQD_A_BACK: [[0, 255, 0], 13]
+      # CMQD_B: [[255, 55, 100], 14]
+      # CMQD_B_BACK: [[0, 255, 0], 15]
+      # CMQD_C: [[0, 255, 0], 16]
+      # CMQD_C_BACK: [[100, 255, 100], 17]
+      # CMQD_D: [[50, 255, 10], 18]
+      # CMQD_D_BACK: [[200, 0, 200], 19]
+      # CMQD_B_VT: [[100, 100, 100], 20]
+      # CMQD_B_VT_BACK: [[100, 255, 200], 21]
+      # PASSPORT: [[0, 200, 100], 22]
+      # PASSPORT_OTHER: [[200, 200, 0], 23]
+    image_size: (800, 800)
+    thresh_score: 0.4
+    thresh_iou_nms: 0.5
+    use_pad_to_square: True
+    ratio_color_mask_on_image: 0.3
+    output_transform: 'lambda x: (x[0], x[-1])'
+
+engine:
+  module: flame.core.engine.engine
+  class: Evaluator
+  Evaluator:
+    dataset: config['data']['test']
+    device: '''cuda'''
+
+extralibs:
+  torch: torch
