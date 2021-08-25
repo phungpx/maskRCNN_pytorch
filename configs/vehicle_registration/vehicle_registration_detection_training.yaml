@@ -4,13 +4,16 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.doc_detection_dataset
-        class: DocDetectionDataset
-        DocDetectionDataset:
-          dirname: '''dataset/VEHICLE_REGISTRATION/DKX_BACK_TYPE_1/train'''
+        module: flame.core.data.maskrcnn_ekycs_dataset
+        class: EkycsDataset
+        EkycsDataset:
+          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
-          image_size: (800, 800)
+            DKX_TYPE_1: 2
+            DKX_BACK_TYPE_5: 3
+            DKX_FRONT_TYPE_5: 4
+          image_size: (448, 448)
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
           transforms:
@@ -25,7 +28,7 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 2
+      batch_size: 16
       shuffle: True
       collate_fn: 'lambda batch:tuple(zip(*batch))'
   
@@ -34,16 +37,19 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.doc_detection_dataset
-        class: DocDetectionDataset
-        DocDetectionDataset:
-          dirname: '''dataset/VEHICLE_REGISTRATION/DKX_BACK_TYPE_1/train'''
+        module: flame.core.data.maskrcnn_ekycs_dataset
+        class: EkycsDataset
+        EkycsDataset:
+          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
-          image_size: (800, 800)
+            DKX_TYPE_1: 2
+            DKX_BACK_TYPE_5: 3
+            DKX_FRONT_TYPE_5: 4
+          image_size: (448, 448)
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 2
+      batch_size: 16
       shuffle: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
   
@@ -52,26 +58,33 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.doc_detection_dataset
-        class: DocDetectionDataset
-        DocDetectionDataset:
-          dirname: '''dataset/VEHICLE_REGISTRATION/DKX_BACK_TYPE_1/valid'''
+        module: flame.core.data.maskrcnn_ekycs_dataset
+        class: EkycsDataset
+        EkycsDataset:
+          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/valid'''
           classes:
             DKX_BACK_TYPE_1: 1
-          image_size: (800, 800)
+            DKX_TYPE_1: 2
+            DKX_BACK_TYPE_5: 3
+            DKX_FRONT_TYPE_5: 4
+          image_size: (448, 448)
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 2
+      batch_size: 16
       shuffle: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
   module: flame.core.model.maskrcnn
-  class: MaskrcnnResnet50FPN
-  MaskrcnnResnet50FPN:
-    num_classes: 2
-    pretrained: True
-    pretrained_backbone: True
+  class: MaskrcnnMobileNetV2
+  MaskrcnnMobileNetV2:
+    num_classes: 5
+    backbone_pretrained: True
+    backbone_out_channels: 256
+    anchor_sizes: ((32, 64, 128, 256, 512),)
+    anchor_aspect_ratios: ((0.5, 1.0, 2.0),)
+    roi_output_size: 7
+    roi_sampling_ratio: 2
 
 optim:
   module: torch.optim
@@ -105,8 +118,8 @@ metrics:
         module: flame.handlers.metrics.mAP
         class: mAP
         mAP:
-          num_classes: 2
-          iou_threshold: 0.8
+          num_classes: 5
+          iou_threshold: 0.5
           box_format: '''corners'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
@@ -129,8 +142,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2104131340/best_model_27_mAP=0.9981.pt'''
-    mode: '''retrain'''
+    checkpoint_path: ''''''
+    mode: '''train'''
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -159,7 +172,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/'''
+    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_mobilenetv2/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -176,7 +189,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/'''
+    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_mobilenetv2/'''
     save_interval: 1
     n_saved: 1
 
