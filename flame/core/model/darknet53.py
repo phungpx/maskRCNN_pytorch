@@ -23,14 +23,26 @@ config_model = [(32, 3, 1), (64, 3, 2), ["B", 1],
 
 
 class CNNBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, use_batch_norm=True, **kwargs):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        use_batch_norm=True,
+        **kwargs
+    ):
         super(CNNBlock, self).__init__()
-        self.conv = nn.Conv2d(in_channels=in_channels,
-                              out_channels=out_channels,
-                              bias=not use_batch_norm,
-                              **kwargs)
-        self.batch_norm = nn.BatchNorm2d(num_features=out_channels)
-        self.leaky_relu = nn.LeakyReLU(negative_slope=0.1)
+        self.conv = nn.Conv2d(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            bias=not use_batch_norm,
+            **kwargs
+        )
+        self.batch_norm = nn.BatchNorm2d(
+            num_features=out_channels
+        )
+        self.leaky_relu = nn.LeakyReLU(
+            negative_slope=0.1
+        )
         self.use_batch_norm = use_batch_norm
 
     def forward(self, x):
@@ -47,8 +59,20 @@ class ResidualBlock(nn.Module):
         self.layers = nn.ModuleList()
         for _ in range(num_repeats):
             self.layers.append(
-                nn.Sequential(CNNBlock(in_channels=channels, out_channels=channels // 2, kernel_size=1),
-                              CNNBlock(in_channels=channels // 2, out_channels=channels, kernel_size=3, padding=1)))
+                nn.Sequential(
+                    CNNBlock(
+                        in_channels=channels,
+                        out_channels=channels // 2,
+                        kernel_size=1
+                    ),
+                    CNNBlock(
+                        in_channels=channels // 2,
+                        out_channels=channels,
+                        kernel_size=3,
+                        padding=1
+                    )
+                )
+            )
         self.use_residual = use_residual
         self.num_repeats = num_repeats
 
@@ -68,16 +92,32 @@ class ScalePrediction(nn.Module):
     def __init__(self, channels, num_classes):
         super(ScalePrediction, self).__init__()
         self.predictor = nn.Sequential(
-            CNNBlock(in_channels=channels, out_channels=2 * channels,
-                     use_batch_norm=True, kernel_size=1),
-            CNNBlock(in_channels=2 * channels, out_channels=3 * (5 + num_classes),
-                     use_batch_norm=False, kernel_size=1))
+            CNNBlock(
+                in_channels=channels,
+                out_channels=2 * channels,
+                use_batch_norm=True,
+                kernel_size=1
+            ),
+            CNNBlock(
+                in_channels=2 * channels,
+                out_channels=3 * (5 + num_classes),
+                use_batch_norm=False,
+                kernel_size=1
+            )
+        )
         self.num_classes = num_classes
 
     def forward(self, x):
-        x = self.predictor(x)  # B x [3 * (num_classes + 5)] x H x W
-        x = x.reshape(x.shape[0], 3, self.num_classes + 5, x.shape[2], x.shape[3])  # B x 3 x [num_classes + 5] x H x W
-        x = x.permute(0, 1, 3, 4, 2).contiguous()  # B x 3 x H x W x [num_classes + 5]
+        x = self.predictor(x)
+        # B x [3 * (num_classes + 5)] x H x W
+        x = x.reshape(
+            x.shape[0], 3, self.num_classes + 5,
+            x.shape[2], x.shape[3]
+        )
+        # B x 3 x [num_classes + 5] x H x W
+        x = x.permute(0, 1, 3, 4, 2).contiguous()
+        # B x 3 x H x W x [num_classes + 5]
+
         return x
 
 
@@ -110,18 +150,27 @@ class YOLOv3(nn.Module):
         for module in config_model:
             if isinstance(module, tuple):
                 out_channels, kernel_size, stride = module
-                layers.append(CNNBlock(in_channels=in_channels, out_channels=out_channels,
-                                       kernel_size=kernel_size, stride=stride, padding=kernel_size // 2))
+                layers.append(CNNBlock(in_channels=in_channels,
+                                       out_channels=out_channels,
+                                       kernel_size=kernel_size,
+                                       stride=stride,
+                                       padding=kernel_size // 2))
                 in_channels = out_channels
             elif isinstance(module, list):
                 num_repeats = module[1]
-                layers.append(ResidualBlock(channels=in_channels, use_residual=True, num_repeats=num_repeats))
+                layers.append(ResidualBlock(channels=in_channels,
+                                            use_residual=True,
+                                            num_repeats=num_repeats))
             elif isinstance(module, str):
                 if module == "S":
-                    layers += [ResidualBlock(channels=in_channels, use_residual=False, num_repeats=1),
-                               CNNBlock(in_channels=in_channels, out_channels=in_channels // 2,
+                    layers += [ResidualBlock(channels=in_channels,
+                                             use_residual=False,
+                                             num_repeats=1),
+                               CNNBlock(in_channels=in_channels,
+                                        out_channels=in_channels // 2,
                                         use_batch_norm=False, kernel_size=1),
-                               ScalePrediction(channels=in_channels // 2, num_classes=self.num_classes)]
+                               ScalePrediction(channels=in_channels // 2,
+                                               num_classes=self.num_classes)]
                     in_channels = in_channels // 2
                 elif module == "U":
                     layers.append(nn.Upsample(scale_factor=2))
