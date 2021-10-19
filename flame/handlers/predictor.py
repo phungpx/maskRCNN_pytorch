@@ -54,13 +54,13 @@ class RegionPredictor(Module):
             image = cv2.imread(image_name)
             labels, boxes, scores, masks = pred['labels'], pred['boxes'], pred['scores'], pred.get('masks', None)
 
-            indices = torchvision.ops.nms(boxes, scores, self.thresh_iou_nms)
+            indices = scores > self.thresh_score
             if masks is not None:
                 labels, boxes, scores, masks = labels[indices], boxes[indices], scores[indices], masks[indices]
             else:
                 labels, boxes, scores = labels[indices], boxes[indices], scores[indices]
 
-            indices = scores > self.thresh_score
+            indices = torchvision.ops.nms(boxes, scores, self.thresh_iou_nms)
             if masks is not None:
                 labels, boxes, scores, masks = labels[indices], boxes[indices], scores[indices], masks[indices]
             else:
