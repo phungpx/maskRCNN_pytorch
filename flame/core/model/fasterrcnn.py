@@ -9,7 +9,10 @@ class FasterRcnnMobilenetV3(nn.Module):
         self.model = self.fasterrcnn_mobilenetv3(num_classes, pretrained, pretrained_backbone)
 
     def fasterrcnn_mobilenetv3(self, num_classes, pretrained, pretrained_backbone):
-        model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(pretrained=pretrained, pretrained_backbone=pretrained_backbone)
+        model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
+            pretrained=pretrained,
+            pretrained_backbone=pretrained_backbone
+        )
         in_features = model.roi_heads.box_predictor.cls_score.in_features
         model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
         return model
@@ -30,7 +33,10 @@ class FasterRcnnResnet50FPN(nn.Module):
         self.model = self.fasterrcnn_resnet50_fpn(num_classes, pretrained, pretrained_backbone)
 
     def fasterrcnn_resnet50_fpn(self, num_classes, pretrained, pretrained_backbone):
-        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=pretrained, pretrained_backbone=pretrained_backbone)
+        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
+            pretrained=pretrained,
+            pretrained_backbone=pretrained_backbone
+        )
         in_features = model.roi_heads.box_predictor.cls_score.in_features
         model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
         return model

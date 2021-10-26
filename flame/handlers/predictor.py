@@ -91,9 +91,12 @@ class RegionPredictor(Module):
                             org=(box[0], box[1]), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                             fontScale=0.001 * max(image.shape[0], image.shape[1]),
                             color=classes[label]['color'], thickness=3, lineType=cv2.LINE_AA)
+
                 if mask is not None:
-                    image[mask.astype(dtype=bool)] = (image[mask.astype(dtype=bool)] * (1. - self.ratio_color_mask_on_image) \
-                            + np.array([classes[label]['color']], dtype=float) * self.ratio_color_mask_on_image).astype(np.uint8)
+                    image[mask.astype(dtype=bool)] = (
+                        image[mask.astype(dtype=bool)] * (1. - self.ratio_color_mask_on_image)
+                        + np.array([classes[label]['color']], dtype=float) * self.ratio_color_mask_on_image
+                    ).astype(np.uint8)
 
             cv2.imwrite(image_path, image)
 
