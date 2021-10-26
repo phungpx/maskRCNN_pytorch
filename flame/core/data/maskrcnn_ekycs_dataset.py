@@ -110,9 +110,9 @@ class EkycsDataset(Dataset):
 
         # transform masks and image
         for transform in random.sample(self.transforms, k=random.randint(0, len(self.transforms))):
-            _transform = transform.to_deterministic()
-            image = _transform(image=image)
-            masks = [_transform(segmentation_maps=mask) for mask in masks]
+            fixed_transform = transform.to_deterministic()
+            image = fixed_transform(image=image)
+            masks = [fixed_transform(segmentation_maps=mask) for mask in masks]
         masks = [mask.get_arr() for mask in masks]
 
         # padding image, masks to square and then resize image and masks
@@ -142,8 +142,14 @@ class EkycsDataset(Dataset):
         masks = masks.permute(2, 0, 1).to(torch.uint8)
 
         # target
-        target = {'boxes': boxes, 'masks': masks, 'labels': labels,
-                  'area': areas, 'iscrowd': iscrowd, 'image_id': image_id}
+        target = {
+            'boxes': boxes,
+            'masks': masks,
+            'labels': labels,
+            'area': areas,
+            'iscrowd': iscrowd,
+            'image_id': image_id
+        }
 
         # image
         sample = torch.from_numpy(np.ascontiguousarray(image))

@@ -5,8 +5,8 @@ data:
     DataLoader:
       dataset:
         module: flame.core.data.fasterrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
+        class: AltheiaDataset
+        AltheiaDataset:
           dirname: '''dataset/EKYCs/train'''
           classes:
             BLX: 1
@@ -57,8 +57,8 @@ data:
     DataLoader:
       dataset:
         module: flame.core.data.fasterrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
+        class: AltheiaDataset
+        AltheiaDataset:
           dirname: '''dataset/EKYCs/train'''
           classes:
             BLX: 1
@@ -97,8 +97,8 @@ data:
     DataLoader:
       dataset:
         module: flame.core.data.fasterrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
+        class: AltheiaDataset
+        AltheiaDataset:
           dirname: '''dataset/EKYCs/valid'''
           classes:
             BLX: 1

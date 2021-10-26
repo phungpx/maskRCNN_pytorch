@@ -9,27 +9,30 @@ from ignite.engine import Events
 
 
 class RegionPredictor(Module):
-    def __init__(self, evaluator_name,
-                 output_dir,
-                 output_img_ext,
-                 output_mask_ext,
-                 classes,
-                 image_size,
-                 use_pad_to_square,
-                 thresh_score,
-                 thresh_iou_nms,
-                 ratio_color_mask_on_image=None,
-                 output_transform=lambda x: x):
+    def __init__(
+        self,
+        evaluator_name,
+        output_dir,
+        output_img_ext,
+        output_mask_ext,
+        classes,
+        image_size,
+        use_pad_to_square,
+        thresh_score,
+        thresh_iou_nms,
+        ratio_color_mask_on_image=None,
+        output_transform=lambda x: x
+    ) -> None:
         super(RegionPredictor, self).__init__()
-        self.evaluator_name = evaluator_name
-        self.output_dir = Path(output_dir)
-        self.output_img_ext = output_img_ext
-        self.output_mask_ext = output_mask_ext
         self.classes = classes
         self.image_size = image_size
-        self.use_pad_to_square = use_pad_to_square
         self.thresh_score = thresh_score
+        self.output_dir = Path(output_dir)
+        self.output_img_ext = output_img_ext
+        self.evaluator_name = evaluator_name
         self.thresh_iou_nms = thresh_iou_nms
+        self.output_mask_ext = output_mask_ext
+        self.use_pad_to_square = use_pad_to_square
         self.ratio_color_mask_on_image = ratio_color_mask_on_image
         self._output_transform = output_transform
 
