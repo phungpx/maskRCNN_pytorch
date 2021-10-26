@@ -215,6 +215,7 @@ metrics:
                 PASSPORT: 22
                 PASSPORT_OTHER: 23
               iou_threshold: 0.5
+              verbose: False
               method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
@@ -237,8 +238,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
-    mode: '''train'''
+    checkpoint_path: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/2110261735/backup_checkpoint_3.pt'''
+    mode: '''resume'''
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan

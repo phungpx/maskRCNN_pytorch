@@ -45,7 +45,7 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 # model:
-#   module: flame.core.model.fasterrcnn_mobilenetv3
+#   module: flame.core.model.fasterrcnn
 #   class: FasterRcnnMobilenetV3
 #   FasterRcnnMobilenetV3:
 #     num_classes: 24
