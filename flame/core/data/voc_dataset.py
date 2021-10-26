@@ -12,16 +12,17 @@ from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 
 class VOCDataset(Dataset):
-    def __init__(self, input_dir, image_pattern, label_pattern, classes, image_size, transforms=None):
+    def __init__(
+        self, dirname, image_pattern, label_pattern, classes, image_size, transforms=None):
         super(VOCDataset, self).__init__()
         self.classes = classes
         self.image_size = image_size
         self.pad_to_square = iaa.PadToSquare(position='right-bottom')
         self.transforms = transforms if transforms else []
-        image_paths = natsorted(list(Path(input_dir).glob(f'{image_pattern}')), key=lambda x: str(x.stem))
-        label_paths = natsorted(list(Path(input_dir).glob(f'{label_pattern}')), key=lambda x: str(x.stem))
+        image_paths = natsorted(list(Path(dirname).glob(f'{image_pattern}')), key=lambda x: str(x.stem))
+        label_paths = natsorted(list(Path(dirname).glob(f'{label_pattern}')), key=lambda x: str(x.stem))
         self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths)]
-        print(f'{Path(input_dir).stem}: {len(self.data_pairs)}')
+        print(f'{Path(dirname).stem}: {len(self.data_pairs)}')
 
     def __len__(self):
         return len(self.data_pairs)

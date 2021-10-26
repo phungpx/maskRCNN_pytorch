@@ -44,7 +44,7 @@ class AltheiaDataset(Dataset):
         self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths)]
 
         self.pad_to_square = iaa.PadToSquare(position='right-bottom', pad_cval=0)
-        self.image_resizer = iaa.Resize(size=image_size, interpolation='linear')
+        self.image_resizer = iaa.Resize(size=image_size, interpolation='cubic')
         self.mask_resizer = iaa.Resize(size=image_size, interpolation='nearest')
 
         print(f'{Path(dirname).stem}: {len(self.data_pairs)}')
@@ -124,9 +124,9 @@ class AltheiaDataset(Dataset):
 
         # Pad to square and then Rescale image, masks and bounding boxes
         image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
-        masks = [self.pad_to_square(image=mask).get_arr() for mask in masks]
+        masks = [self.pad_to_square(image=mask) for mask in masks]
         image, bboxes = self.image_resizer(image=image, bounding_boxes=bboxes)
-        masks = [self.mask_resizer(image=mask).get_arr() for mask in masks]
+        masks = [self.mask_resizer(image=mask) for mask in masks]
         bboxes = bboxes.on(image)
 
         # Convert from Bouding Box Object to boxes, labels list

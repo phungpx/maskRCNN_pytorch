@@ -4,10 +4,10 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.fasterrcnn_ekycs_dataset
+        module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/EKYCs/train'''
+          dirname: '''../efficient_det_pytorch/dataset/EKYCs/train'''
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -33,6 +33,8 @@ data:
             PASSPORT: 22
             PASSPORT_OTHER: 23
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
           transforms:
@@ -47,8 +49,11 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 256
+      batch_size: 4
       shuffle: True
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
   
   train_eval:
@@ -56,10 +61,10 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.fasterrcnn_ekycs_dataset
+        module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/EKYCs/train'''
+          dirname: '''../efficient_det_pytorch/dataset/EKYCs/train'''
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -85,10 +90,15 @@ data:
             PASSPORT: 22
             PASSPORT_OTHER: 23
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 256
+      batch_size: 4
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
   
   valid:
@@ -96,10 +106,10 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.fasterrcnn_ekycs_dataset
+        module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/EKYCs/valid'''
+          dirname: '''../efficient_det_pytorch/dataset/EKYCs/valid'''
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -125,18 +135,31 @@ data:
             PASSPORT: 22
             PASSPORT_OTHER: 23
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 256
+      batch_size: 4
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
+# model:
+#   module: flame.core.model.fasterrcnn
+#   class: FasterRcnnMobilenetV3
+#   FasterRcnnMobilenetV3:
+#     num_classes: 24
+#     pretrained: True
+
 model:
-  module: flame.core.model.fasterrcnn_torchvision
-  class: FasterRcnnMobilenetV3
-  FasterRcnnMobilenetV3:
+  module: flame.core.model.fasterrcnn
+  class: FasterRcnnResnet50FPN
+  FasterRcnnResnet50FPN:
     num_classes: 24
     pretrained: True
+    pretrained_backbone: True
 
 optim:
   module: torch.optim
@@ -167,12 +190,39 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.mAP
-        class: mAP
-        mAP:
-          num_classes: 24
-          iou_threshold: 0.5
-          box_format: '''corners'''
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                BLX: 1
+                BLX_BACK: 2
+                BLX_OLD: 3
+                BLX_BACK_OLD: 4
+                CMND: 5
+                CMND_BACK: 6
+                CCCD: 7
+                CCCD_BACK: 8
+                CMCC: 9
+                CCCD_front_chip: 10
+                CCCD_back_chip: 11
+                CMQD_A: 12
+                CMQD_A_BACK: 13
+                CMQD_B: 14
+                CMQD_B_BACK: 15
+                CMQD_C: 16
+                CMQD_C_BACK: 17
+                CMQD_D: 18
+                CMQD_D_BACK: 19
+                CMQD_B_VT: 20
+                CMQD_B_VT_BACK: 21
+                PASSPORT: 22
+                PASSPORT_OTHER: 23
+              iou_threshold: 0.5
+              method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
       train_evaluator: '''train'''
@@ -211,16 +261,6 @@ lr_scheduler:
     patience: 5
     verbose: True
 
-# lr_scheduler:
-#   module: flame.handlers.lr_scheduler
-#   class: StepLR
-#   StepLR:
-#     score_name: '''mAP'''
-#     evaluator_name: '''valid_evaluator'''
-#     step_size: 3
-#     gamma: 0.1
-#     verbose: True
-
 early_stopping:
   module: flame.handlers.early_stopping
   class: EarlyStopping
@@ -234,7 +274,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EKYCs/fasterrcnn_mobilenetv3/'''
+    dirname: '''checkpoint/EKYCs/fasterrcnn_resnet50fpn/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -251,7 +291,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EKYCs/fasterrcnn_mobilenetv3/'''
+    dirname: '''checkpoint/EKYCs/fasterrcnn_resnet50fpn/'''
     save_interval: 1
     n_saved: 1
 

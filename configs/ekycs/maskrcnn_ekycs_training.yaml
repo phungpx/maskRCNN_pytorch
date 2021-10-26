@@ -49,7 +49,7 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 64
+      batch_size: 4
       shuffle: True
       num_workers: 12
       pin_memory: True
@@ -94,7 +94,7 @@ data:
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 64
+      batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -139,7 +139,7 @@ data:
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 64
+      batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -147,7 +147,7 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.maskrcnn_torchvision
+  module: flame.core.model.maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     num_classes: 24

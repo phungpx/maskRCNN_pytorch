@@ -4,9 +4,9 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.maskrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
+        module: flame.core.data.altheia_dataset
+        class: AltheiaDataset
+        AltheiaDataset:
           dirname: '''../efficient_det_pytorch/dataset/EKYCs/test'''
           classes:
             BLX: 1
@@ -32,40 +32,22 @@ data:
             CMQD_B_VT_BACK: 21
             PASSPORT: 22
             PASSPORT_OTHER: 23
-            # BLX: 1
-            # BLX_BACK: 1
-            # BLX_OLD: 1
-            # BLX_BACK_OLD: 1
-            # CMND: 1
-            # CMND_BACK: 1
-            # CCCD: 1
-            # CCCD_BACK: 1
-            # CMCC: 1
-            # CCCD_front_chip: 1
-            # CCCD_back_chip: 1
-            # CMQD_A: 1
-            # CMQD_A_BACK: 1
-            # CMQD_B: 1
-            # CMQD_B_BACK: 1
-            # CMQD_C: 1
-            # CMQD_C_BACK: 1
-            # CMQD_D: 1
-            # CMQD_D_BACK: 1
-            # CMQD_B_VT: 1
-            # CMQD_B_VT_BACK: 1
-            # PASSPORT: 1
-            # PASSPORT_OTHER: 1
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 32
+      batch_size: 4
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.maskrcnn_torchvision
-  class: MaskrcnnMobileNetV3
-  MaskrcnnMobileNetV3:
+  module: flame.core.model.maskrcnn
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
     num_classes: 24
     pretrained: False
     pretrained_backbone: False
@@ -136,7 +118,6 @@ predictor:
     output_img_ext: '''.jpg'''
     output_mask_ext: '''.png'''
     classes:
-      # card: [[0, 255, 0], 1]
       BLX: [[0, 255, 0], 1]
       BLX_BACK: [[255, 255, 0], 2]
       BLX_OLD: [[0, 255, 255], 3]
