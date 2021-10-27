@@ -4,21 +4,26 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.maskrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
-          dirname: '''/extdata/ocr/phungpx/projects/NAME_CARD/name_card_segmentation/dataset/test'''
+        module: flame.core.data.altheia_dataset
+        class: AltheiaDataset
+        AltheiaDataset:
+          dirname: '''dataset/NAME_CARD/test'''
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.xml''']
-      batch_size: 32
+      batch_size: 4
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.maskrcnn_torchvision
+  module: flame.core.model.maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     num_classes: 2
@@ -31,16 +36,18 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.evaluator
-        class: Evaluation
-        Evaluation:
-          evaluation_fn:
-            module: flame.handlers.metrics.metric_function.mAP
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
             class: MeanAveragePrecision
             MeanAveragePrecision:
-              num_classes: 2
+              classes:
+                CARD_VISIT: 1
               iou_threshold: 0.5
-              box_format: '''corners'''
+              verbose: True
+              method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
       engine: '''test'''
@@ -56,7 +63,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/NAME_CARD/maskrcnn_resnet50fpn/2105080820/best_model_11_mAP=0.9975.pt'''
+    checkpoint_path: '''checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844.pt'''
     mode: '''test'''
 
 predictor:
@@ -64,14 +71,14 @@ predictor:
   class: RegionPredictor
   RegionPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/NAME_CARD/maskrcnn_resnet50fpn/2105080820/best_model_11_mAP=0.9975/test'''
+    output_dir: '''checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844/test'''
     output_img_ext: '''.jpg'''
     output_mask_ext: '''.png'''
     classes:
-      name_card: [[0, 255, 0], 1]
+      CARD_VISIT: [[0, 255, 0], 1]
     image_size: (800, 800)
-    thresh_score: 0.8
-    thresh_iou_nms: 0.4
+    thresh_score: 0.4
+    thresh_iou_nms: 0.5
     use_pad_to_square: True
     ratio_color_mask_on_image: 0.3
     output_transform: 'lambda x: (x[0], x[-1])'

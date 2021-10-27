@@ -167,8 +167,11 @@ class MeanAveragePrecision(nn.Module):
 
         return mAP
 
-    def every_points_interpolated_AP(self, recalls: List[float],
-                                     precisions: List[float]) -> Tuple[float, List[float], List[float]]:
+    def every_points_interpolated_AP(
+        self,
+        recalls: List[float],
+        precisions: List[float]
+    ) -> Tuple[float, List[float], List[float]]:
         r'''every-point interpolated average precision
         '''
 
@@ -185,8 +188,11 @@ class MeanAveragePrecision(nn.Module):
 
         return average_precision, mrecalls[0:-1], mprecisions[0:-1]
 
-    def eleven_points_interpolated_AP(self, recalls: List[float],
-                                      precisions: List[float]) -> Tuple[float, List[float], List[float]]:
+    def eleven_points_interpolated_AP(
+        self,
+        recalls: List[float],
+        precisions: List[float]
+    ) -> Tuple[float, List[float], List[float]]:
         r'''11-point interpolated average precision
         '''
 
