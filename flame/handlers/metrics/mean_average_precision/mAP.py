@@ -157,7 +157,7 @@ class MeanAveragePrecision(nn.Module):
                 ]
             )
 
-        mAP = sum(average_precisions) / len(average_precisions) if len(average_precisions) else 0.
+        mAP = min(1., sum(average_precisions) / len(average_precisions)) if len(average_precisions) else 0.
 
         if self.verbose:
             print(average_precision_stats)

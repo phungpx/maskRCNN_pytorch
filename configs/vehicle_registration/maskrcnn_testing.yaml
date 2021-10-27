@@ -4,9 +4,9 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.altheia_dataset
-        class: AltheiaDataset
-        AltheiaDataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
           dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/test'''
           classes:
             DKX_BACK_TYPE_1: 1
@@ -21,7 +21,7 @@ data:
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.xml''']
+          label_patterns: ['''*.json''']
       batch_size: 4
       shuffle: False
       num_workers: 12
@@ -77,7 +77,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844.pt'''
+    checkpoint_path: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110270926/best_model_13_mAP=0.9963.pt'''
     mode: '''test'''
 
 predictor:
@@ -85,7 +85,7 @@ predictor:
   class: RegionPredictor
   RegionPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844/test'''
+    output_dir: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110270926/best_model_13_mAP=0.9963/test'''
     output_img_ext: '''.jpg'''
     output_mask_ext: '''.png'''
     classes:
