@@ -4,24 +4,36 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.doc_detection_dataset
-        class: DocDetectionDataset
-        DocDetectionDataset:
-          dirname: '''dataset/VEHICLE_REGISTRATION/DKX_BACK_TYPE_1/test'''
+        module: flame.core.data.altheia_dataset
+        class: AltheiaDataset
+        AltheiaDataset:
+          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/test'''
           classes:
             DKX_BACK_TYPE_1: 1
+            DKX_TYPE_1: 2
+            DKX_BACK_TYPE_2: 3
+            DKX_TYPE_2: 4
+            DKX_BACK_TYPE_3: 5
+            DKX_TYPE_3: 6
+            DKX_BACK_TYPE_5: 7
+            DKX_FRONT_TYPE_5: 8
           image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.json''']
-      batch_size: 2
+          label_patterns: ['''*.xml''']
+      batch_size: 4
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
   module: flame.core.model.maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
-    num_classes: 2
+    num_classes: 9
     pretrained: False
     pretrained_backbone: False
 
@@ -31,12 +43,25 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.mAP
-        class: mAP
-        mAP:
-          num_classes: 2
-          iou_threshold: 0.8
-          box_format: '''corners'''
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                DKX_BACK_TYPE_1: 1
+                DKX_TYPE_1: 2
+                DKX_BACK_TYPE_2: 3
+                DKX_TYPE_2: 4
+                DKX_BACK_TYPE_3: 5
+                DKX_TYPE_3: 6
+                DKX_BACK_TYPE_5: 7
+                DKX_FRONT_TYPE_5: 8
+              iou_threshold: 0.5
+              verbose: True
+              method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
       engine: '''test'''
@@ -52,7 +77,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2106281424/best_model_4_mAP=1.0000.pt'''
+    checkpoint_path: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844.pt'''
     mode: '''test'''
 
 predictor:
@@ -60,14 +85,21 @@ predictor:
   class: RegionPredictor
   RegionPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2106281424/best_model_4_mAP=1.0000/test'''
+    output_dir: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844/test'''
     output_img_ext: '''.jpg'''
     output_mask_ext: '''.png'''
     classes:
       DKX_BACK_TYPE_1: [[0, 255, 0], 1]
+      DKX_TYPE_1: [[255, 255, 0], 2]
+      DKX_BACK_TYPE_2: [[0, 255, 255], 3]
+      DKX_TYPE_2: [[255, 0, 0], 4]
+      DKX_BACK_TYPE_3: [[0, 0, 255], 5]
+      DKX_TYPE_3: [[140, 255, 0], 6]
+      DKX_BACK_TYPE_5: [[0, 255, 140], 7]
+      DKX_FRONT_TYPE_5: [[140, 0, 255], 8]
     image_size: (800, 800)
-    thresh_score: 0.8
-    thresh_iou_nms: 0.4
+    thresh_score: 0.4
+    thresh_iou_nms: 0.5
     use_pad_to_square: True
     ratio_color_mask_on_image: 0.3
     output_transform: 'lambda x: (x[0], x[-1])'

@@ -90,6 +90,7 @@ metrics:
                 PASSPORT: 22
                 PASSPORT_OTHER: 23
               iou_threshold: 0.5
+              verbose: True
               method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:

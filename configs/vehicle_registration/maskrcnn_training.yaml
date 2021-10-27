@@ -4,16 +4,22 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.maskrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
-          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/train'''
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
+          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2
-            DKX_BACK_TYPE_5: 3
-            DKX_FRONT_TYPE_5: 4
-          image_size: (448, 448)
+            DKX_BACK_TYPE_2: 3
+            DKX_TYPE_2: 4
+            DKX_BACK_TYPE_3: 5
+            DKX_TYPE_3: 6
+            DKX_BACK_TYPE_5: 7
+            DKX_FRONT_TYPE_5: 8
+          image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
           transforms:
@@ -28,59 +34,80 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 16
+      batch_size: 8
       shuffle: True
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+
   train_eval:
     module: torch.utils.data
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.maskrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
-          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/train'''
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
+          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2
-            DKX_BACK_TYPE_5: 3
-            DKX_FRONT_TYPE_5: 4
-          image_size: (448, 448)
+            DKX_BACK_TYPE_2: 3
+            DKX_TYPE_2: 4
+            DKX_BACK_TYPE_3: 5
+            DKX_TYPE_3: 6
+            DKX_BACK_TYPE_5: 7
+            DKX_FRONT_TYPE_5: 8
+          image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 16
+      batch_size: 8
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+
   valid:
     module: torch.utils.data
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.maskrcnn_ekycs_dataset
-        class: EkycsDataset
-        EkycsDataset:
-          dirname: '''/extdata/ocr/phungpx/projects/PHUNGPX/dataset/VEHICLE_REGISTRATION/valid'''
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
+          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/valid'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2
-            DKX_BACK_TYPE_5: 3
-            DKX_FRONT_TYPE_5: 4
-          image_size: (448, 448)
+            DKX_BACK_TYPE_2: 3
+            DKX_TYPE_2: 4
+            DKX_BACK_TYPE_3: 5
+            DKX_TYPE_3: 6
+            DKX_BACK_TYPE_5: 7
+            DKX_FRONT_TYPE_5: 8
+          image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 16
+      batch_size: 8
       shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
   module: flame.core.model.maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
-    num_classes: 5
+    num_classes: 9
     pretrained: True
-    pretrained_backbone: False
+    pretrained_backbone: True
 
 optim:
   module: torch.optim
@@ -111,12 +138,25 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.metric_fn.mAP
-        class: mAP
-        mAP:
-          num_classes: 5
-          iou_threshold: 0.5
-          box_format: '''corners'''
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                DKX_BACK_TYPE_1: 1
+                DKX_TYPE_1: 2
+                DKX_BACK_TYPE_2: 3
+                DKX_TYPE_2: 4
+                DKX_BACK_TYPE_3: 5
+                DKX_TYPE_3: 6
+                DKX_BACK_TYPE_5: 7
+                DKX_FRONT_TYPE_5: 8
+              iou_threshold: 0.5
+              verbose: False
+              method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
       train_evaluator: '''train'''
@@ -168,7 +208,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_mobilenetv2/'''
+    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -185,7 +225,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_mobilenetv2/'''
+    dirname: '''checkpoint/VEHICLE_REGISTRATION/maskrcnn_resnet50fpn/'''
     save_interval: 1
     n_saved: 1
 
