@@ -32,7 +32,7 @@ model:
     num_classes: 5
     pretrained: False
     pretrained_backbone: False
-    score_threshold: 0.7
+    score_threshold: 0.5
     nms_threshold: 0.5
 
 metrics:
@@ -71,7 +71,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271154/best_model_19_mAP=1.0058.pt'''
+    checkpoint_path: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271714/best_model_11_mAP=0.9931.pt'''
     mode: '''test'''
 
 predictor:
@@ -79,11 +79,11 @@ predictor:
   class: MaskPredictor
   MaskPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271154/best_model_19_mAP=1.0058/test'''
+    output_dir: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271714/best_model_11_mAP=0.9931/test'''
     classes:
       DKIX_COVER_1: [[0, 255, 0], 1]
       DKIX_COVER_2: [[255, 255, 0], 2]
-      DKIX_CONTENT_1: [[0, 255, 255], 3]
+      DKIX_CONTENT_1: [[0, 0, 255], 3]
       DKIX_CONTENT_2: [[255, 0, 0], 4]
     alpha: 0.3
     image_size: (800, 800)
