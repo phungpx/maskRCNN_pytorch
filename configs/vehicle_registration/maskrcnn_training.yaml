@@ -108,6 +108,8 @@ model:
     num_classes: 9
     pretrained: True
     pretrained_backbone: True
+    score_threshold: 0.2
+    nms_threshold: 0.2
 
 optim:
   module: torch.optim

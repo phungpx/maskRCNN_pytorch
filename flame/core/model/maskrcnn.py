@@ -7,14 +7,36 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 
 class MaskrcnnResnet50FPN(nn.Module):
-    def __init__(self, num_classes, pretrained=False, pretrained_backbone=False):
+    def __init__(
+        self,
+        num_classes,
+        pretrained=False,
+        pretrained_backbone=False,
+        score_threshold=0.05,
+        nms_threshold=0.5,
+    ):
         super(MaskrcnnResnet50FPN, self).__init__()
-        self.model = self.maskrcnn(num_classes, pretrained, pretrained_backbone)
+        self.model = self.maskrcnn(
+            num_classes,
+            pretrained,
+            pretrained_backbone,
+            score_threshold,
+            nms_threshold,
+        )
 
-    def maskrcnn(self, num_classes, pretrained, pretrained_backbone):
+    def maskrcnn(
+        self,
+        num_classes,
+        pretrained,
+        pretrained_backbone,
+        score_threshold,
+        nms_threshold,
+    ):
         model = torchvision.models.detection.maskrcnn_resnet50_fpn(
             pretrained=pretrained,
-            pretrained_backbone=pretrained_backbone
+            pretrained_backbone=pretrained_backbone,
+            box_score_thresh=score_threshold,
+            box_nms_thresh=nms_threshold,
         )
         in_features = model.roi_heads.box_predictor.cls_score.in_features
         model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)

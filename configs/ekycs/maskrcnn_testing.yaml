@@ -51,6 +51,8 @@ model:
     num_classes: 24
     pretrained: False
     pretrained_backbone: False
+    score_threshold: 0.5
+    nms_threshold: 0.2
 
 metrics:
   module: flame.handlers.metrics.metrics
@@ -111,13 +113,11 @@ checkpoint_loader:
     mode: '''test'''
 
 predictor:
-  module: flame.handlers.predictor
-  class: RegionPredictor
-  RegionPredictor:
+  module: flame.handlers.mask_predictor
+  class: MaskPredictor
+  MaskPredictor:
     evaluator_name: '''engine'''
     output_dir: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844/test'''
-    output_img_ext: '''.jpg'''
-    output_mask_ext: '''.png'''
     classes:
       BLX: [[0, 255, 0], 1]
       BLX_BACK: [[255, 255, 0], 2]
@@ -142,11 +142,11 @@ predictor:
       CMQD_B_VT_BACK: [[100, 255, 200], 21]
       PASSPORT: [[0, 200, 100], 22]
       PASSPORT_OTHER: [[200, 200, 0], 23]
+    alpha: 0.3
     image_size: (800, 800)
-    thresh_score: 0.4
-    thresh_iou_nms: 0.5
+    # score_threshold: 0.4
+    # iou_threshold: 0.5
     use_pad_to_square: True
-    ratio_color_mask_on_image: 0.3
     output_transform: 'lambda x: (x[0], x[-1])'
 
 engine:
