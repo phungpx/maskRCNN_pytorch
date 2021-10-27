@@ -106,7 +106,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EKYCs/maskrcnn_mobilenetv3/2104300726/best_model_18_mAP=0.9985.pt'''
+    checkpoint_path: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844.pt'''
     mode: '''test'''
 
 predictor:
@@ -114,7 +114,7 @@ predictor:
   class: RegionPredictor
   RegionPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EKYCs/maskrcnn_mobilenetv3/2104300726/best_model_18_mAP=0.9985/test'''
+    output_dir: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/2110262130/best_model_10_mAP=0.8844/test'''
     output_img_ext: '''.jpg'''
     output_mask_ext: '''.png'''
     classes:
