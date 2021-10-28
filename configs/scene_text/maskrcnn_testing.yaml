@@ -8,9 +8,9 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''SCENE_TEXT/focused_scene_text_2013/test'''
-            - '''SCENE_TEXT/incidental_scene_text_2015/test'''
-            - '''SCENE_TEXT/totaltext/valid'''
+            - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
+            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
+            - '''dataset/SCENE_TEXT/totaltext/valid'''
           classes:
             word: 1
           image_size: None
@@ -18,7 +18,7 @@ data:
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 8
+      batch_size: 1
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -32,7 +32,7 @@ model:
     num_classes: 2
     pretrained: False
     pretrained_backbone: False
-    score_threshold: 0.2
+    score_threshold: 0.5
     nms_threshold: 0.2
 
 metrics:
@@ -68,7 +68,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110270926/best_model_13_mAP=0.9963.pt'''
+    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281439/best_model_3_mAP=0.5897.pt'''
     mode: '''test'''
 
 predictor:
@@ -76,7 +76,7 @@ predictor:
   class: MaskPredictor
   MaskPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110270926/best_model_13_mAP=0.9963/test'''
+    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281439/best_model_3_mAP=0.5897/test'''
     classes:
       word: [[0, 255, 0], 1]
     alpha: 0.3
