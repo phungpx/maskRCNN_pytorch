@@ -68,7 +68,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281439/best_model_3_mAP=0.5897.pt'''
+    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281642/best_model_35_mAP=0.6802.pt'''
     mode: '''test'''
 
 predictor:
@@ -76,10 +76,11 @@ predictor:
   class: MaskPredictor
   MaskPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281439/best_model_3_mAP=0.5897/test'''
+    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281642/best_model_35_mAP=0.6802/test'''
     classes:
       word: [[0, 255, 0], 1]
     alpha: 0.3
+    draw_box: False
     image_size: None
     # score_threshold: 0.4
     # iou_threshold: 0.5

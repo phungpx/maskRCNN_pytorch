@@ -13,6 +13,7 @@ class MaskPredictor(Module):
     def __init__(
         self,
         alpha: float = 0.3,
+        draw_box: bool = True,
         image_size: Optional[Tuple[int, int]] = (800, 800),  # w, h
         evaluator_name: str = None,
         classes: Dict[str, List] = None,
@@ -26,6 +27,7 @@ class MaskPredictor(Module):
         super(MaskPredictor, self).__init__()
         self.alpha = alpha
         self.classes = classes
+        self.draw_box = draw_box
         self.image_size = image_size
         self.iou_threshold = iou_threshold
         self.evaluator_name = evaluator_name
@@ -57,8 +59,10 @@ class MaskPredictor(Module):
 
             image = cv2.imread(image_path)
 
-            labels, boxes = pred['labels'], pred['boxes']
-            scores, masks = pred['scores'], pred['masks']
+            labels = pred['labels']  # Int64Tensor, shape: N
+            boxes = pred['boxes']  # Float32Tensor, shape: N x 4 (x1, y1, x2, y2)
+            scores = pred['scores']  # Float32Tensor, shape: N
+            masks = pred['masks']  # probability map range [0, 1], Float32Tensor, shape: N x 1 x H x W
 
             if self.score_threshold:
                 indices = scores > self.score_threshold
@@ -73,8 +77,8 @@ class MaskPredictor(Module):
             boxes = boxes.data.cpu().numpy().tolist()
             labels = labels.data.cpu().numpy().tolist()
             scores = scores.data.cpu().numpy().tolist()
-            masks = (masks > self.binary_threshold).to(torch.float32)
-            masks = masks.squeeze(dim=1).cpu().numpy()
+            masks = (masks > self.binary_threshold).to(torch.uint8)  # N x 1 x H x W
+            masks = masks.squeeze(dim=1).cpu().numpy()  # N x H x W
 
             if self.classes:
                 classes = {
@@ -97,39 +101,54 @@ class MaskPredictor(Module):
                     continue
 
                 color = classes[label][1] if self.classes else [0, 0, 255]
-                class_name = classes[label][0] if self.classes else str(label)
-                x1, y1, x2, y2 = np.int32([box[0] * fx, box[1] * fy, box[2] * fx, box[3] * fy])
+                if self.draw_box:
+                    class_name = classes[label][0] if self.classes else str(label)
+                    x1, y1, x2, y2 = np.int32([box[0] * fx, box[1] * fy, box[2] * fx, box[3] * fy])
 
-                cv2.rectangle(
-                    img=image, pt1=(x1, y1), pt2=(x2, y2),
-                    color=color, thickness=box_thickness
-                )
+                    cv2.rectangle(
+                        img=image, pt1=(x1, y1), pt2=(x2, y2),
+                        color=color, thickness=box_thickness
+                    )
 
-                title = f"{class_name}: {score:.4f}"
-                w_text, h_text = cv2.getTextSize(
-                    title, cv2.FONT_HERSHEY_PLAIN, font_scale, text_thickness
-                )[0]
+                    title = f"{class_name}: {score:.4f}"
+                    w_text, h_text = cv2.getTextSize(
+                        title, cv2.FONT_HERSHEY_PLAIN, font_scale, text_thickness
+                    )[0]
 
-                cv2.rectangle(
-                    img=image, pt1=(x1, y1 + int(1.6 * h_text)), pt2=(x1 + w_text, y1),
-                    color=color, thickness=-1
-                )
+                    cv2.rectangle(
+                        img=image, pt1=(x1, y1 + int(1.6 * h_text)), pt2=(x1 + w_text, y1),
+                        color=color, thickness=-1
+                    )
 
-                cv2.putText(
-                    img=image, text=title, org=(x1, y1 + int(1.3 * h_text)),
-                    fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale,
-                    color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
-                )
+                    cv2.putText(
+                        img=image, text=title, org=(x1, y1 + int(1.3 * h_text)),
+                        fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale,
+                        color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
+                    )
 
                 if self.image_size is not None:
                     mask = cv2.resize(mask, dsize=original_size, interpolation=cv2.INTER_NEAREST)
                     mask = mask[:image.shape[0], :image.shape[1]]
 
+                mask = self._rm_small_components(mask, class_ratio=0.)
+
                 image[mask == 1] = (
                     image[mask == 1] * (1. - self.alpha) + np.array(color, dtype=np.float) * self.alpha
                 ).astype(np.uint8)
 
+                # draw boundary of mask
+                contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+                cv2.drawContours(image=image, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=box_thickness)
+
             cv2.imwrite(save_path, image)
+
+    def _rm_small_components(self, mask: np.ndarray, class_ratio: float) -> np.ndarray:
+        num_class, label = cv2.connectedComponents(mask)
+        for i in range(1, num_class):
+            area = (label == i).sum()
+            if area < class_ratio * mask.shape[0] * mask.shape[1]:
+                mask[label == i] = 0
+        return mask
 
     def compute(self):
         pass

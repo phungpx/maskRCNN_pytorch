@@ -9,7 +9,7 @@ data:
         LabelmeDataset:
           dirnames:
             - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            - '''dataset/SCENE_TEXT/icdar_2011/train'''
+            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
             - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
             - '''dataset/SCENE_TEXT/totaltext/train'''
           classes:
@@ -31,7 +31,7 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 4
+      batch_size: 2
       shuffle: True
       num_workers: 12
       pin_memory: True
@@ -48,7 +48,7 @@ data:
         LabelmeDataset:
           dirnames:
             - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            - '''dataset/SCENE_TEXT/icdar_2011/train'''
+            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
             - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
             - '''dataset/SCENE_TEXT/totaltext/train'''
           classes:
@@ -58,7 +58,7 @@ data:
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 4
+      batch_size: 2
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -84,7 +84,7 @@ data:
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 4
+      batch_size: 2
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -96,8 +96,8 @@ model:
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     num_classes: 2
-    pretrained: True
-    pretrained_backbone: True
+    pretrained: False
+    pretrained_backbone: False
     score_threshold: 0.2
     nms_threshold: 0.2
 
@@ -163,8 +163,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
-    mode: '''train'''
+    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281439/backup_checkpoint_6.pt'''
+    mode: '''resume'''
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -187,7 +187,7 @@ early_stopping:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 5
+    patience: 10
 
 best_saver:
   module: flame.handlers.checkpoint
