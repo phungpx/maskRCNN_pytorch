@@ -7,7 +7,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/test'''
+          dirnames:
+            - '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/test'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2

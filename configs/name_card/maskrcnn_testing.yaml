@@ -7,7 +7,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/NAME_CARD/test'''
+          dirnames:
+            - '''dataset/NAME_CARD/test'''
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)

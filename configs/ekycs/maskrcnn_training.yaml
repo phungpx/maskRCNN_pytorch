@@ -7,7 +7,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''../efficient_det_pytorch/dataset/EKYCs/train'''
+          dirnames:
+            - '''../efficient_det_pytorch/dataset/EKYCs/train'''
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -64,7 +65,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''../efficient_det_pytorch/dataset/EKYCs/train'''
+          dirnames:
+            - '''../efficient_det_pytorch/dataset/EKYCs/train'''
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -109,7 +111,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''../efficient_det_pytorch/dataset/EKYCs/valid'''
+          dirnames:
+            - '''../efficient_det_pytorch/dataset/EKYCs/valid'''
           classes:
             BLX: 1
             BLX_BACK: 2

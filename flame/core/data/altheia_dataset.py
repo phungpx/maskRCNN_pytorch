@@ -16,7 +16,7 @@ from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 class AltheiaDataset(Dataset):
     def __init__(
         self,
-        dirname: str = None,
+        dirnames: List[str] = None,
         image_size: Tuple[int, int] = (800, 800),
         image_patterns: List[str] = ['*.jpg'],
         label_patterns: List[str] = ['*.xml'],
@@ -33,31 +33,37 @@ class AltheiaDataset(Dataset):
         self.transforms = transforms if transforms else []
 
         image_paths, label_paths = [], []
-        for image_pattern in image_patterns:
-            image_paths.extend(Path(dirname).glob('**/{}'.format(image_pattern)))
-        for label_pattern in label_patterns:
-            label_paths.extend(Path(dirname).glob('**/{}'.format(label_pattern)))
+        for dirname in dirnames:
+            for image_pattern in image_patterns:
+                image_paths.extend(Path(dirname).glob('**/{}'.format(image_pattern)))
+            for label_pattern in label_patterns:
+                label_paths.extend(Path(dirname).glob('**/{}'.format(label_pattern)))
 
         image_paths = natsorted(image_paths, key=lambda x: str(x.stem))
         label_paths = natsorted(label_paths, key=lambda x: str(x.stem))
 
-        self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths)]
+        self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths) if image.stem == label.stem]
 
         self.pad_to_square = iaa.PadToSquare(position='right-bottom', pad_cval=0)
         self.image_resizer = iaa.Resize(size=image_size, interpolation='cubic')
         self.mask_resizer = iaa.Resize(size=image_size, interpolation='nearest')
 
-        print(f'{Path(dirname).stem}: {len(self.data_pairs)}')
+        print(f'{Path(dirnames[0]).stem}: {len(self.data_pairs)}')
 
     def __len__(self):
         return len(self.data_pairs)
 
-    def _get_altheia_info(self, label_path: str, classes: dict) -> Dict:
+    def to_4points(self, points: List[Tuple[float, float]]) -> List[Tuple[float, float]]:
+        x1, y1 = points[0][0], points[0][1]
+        x2, y2 = points[1][0], points[1][1]
+        return [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]
+
+    def get_annotation(self, label_path: str, classes: dict) -> Dict:
         root = ET.parse(str(label_path)).getroot()
         page = root.find('{}Page'.format(''.join(root.tag.partition('}')[:2])))
-        width, height = int(page.get('imageWidth')), int(page.get('imageHeight'))
+        w, h = int(page.get('imageWidth')), int(page.get('imageHeight'))
 
-        label_info = []
+        annots = []
         for card_type, label in classes.items():
             regions = root.findall('.//*[@value=\"{}\"]/../..'.format(card_type))
             regions += root.findall('.//*[@name=\"{}\"]/../..'.format(card_type))
@@ -66,37 +72,48 @@ class AltheiaDataset(Dataset):
                     [int(float(coord)) for coord in point.split(',')]
                     for point in region[0].get('points').split()
                 ]
-                mask = np.zeros(shape=(height, width), dtype=np.uint8)
-                cv2.fillPoly(img=mask, pts=np.int32([points]), color=1)
+
+                if len(points) == 2:
+                    points = self.to_4points(points)
+                elif len(points) <= 1:
+                    continue
 
                 x1 = min([point[0] for point in points])
                 y1 = min([point[1] for point in points])
                 x2 = max([point[0] for point in points])
                 y2 = max([point[1] for point in points])
-                bbox = (x1, y1, x2, y2)
 
-                label_info.append({'mask': mask, 'label': label, 'bbox': bbox})
+                if w >= x2 > x1 and h >= y2 > y1:
+                    mask = np.zeros(shape=(h, w), dtype=np.uint8)
+                    annots.append(
+                        {
+                            'mask': cv2.fillPoly(img=mask, pts=np.int32([points]), color=1),
+                            'label': label,
+                            'box': (x1, y1, x2, y2)
+                        }
+                    )
 
-        if not len(label_info):
-            label_info.append(
+        if not len(annots):
+            annots.append(
                 {
-                    'mask': np.zeros(shape=(height, width), dtype=np.uint8),
+                    'mask': np.zeros(shape=(h, w), dtype=np.uint8),
                     'label': -1,
-                    'bbox': (0, 0, 1, 1)
+                    'box': (0, 0, 1, 1)
                 }
             )
 
-        return label_info
+        return annots
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, Dict, Tuple[str, Tuple[int, int]]]:
         image_path, label_path = self.data_pairs[idx]
-        label_info = self._get_altheia_info(label_path=str(label_path), classes=self.classes)
 
         image = cv2.imread(str(image_path))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        boxes = [label['bbox'] for label in label_info]
-        labels = [label['label'] for label in label_info]
-        masks = [label['mask'] for label in label_info]
+
+        annots = self.get_annotation(label_path=str(label_path), classes=self.classes)
+        boxes = [annot['box'] for annot in annots]
+        labels = [annot['label'] for annot in annots]
+        masks = [annot['mask'] for annot in annots]
 
         image_info = (str(image_path), image.shape[1::-1])  # image path, (w, h)
 
@@ -122,11 +139,13 @@ class AltheiaDataset(Dataset):
 
         masks = [mask.get_arr() for mask in masks]
 
-        # Pad to square and then Rescale image, masks and bounding boxes
-        image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
-        masks = [self.pad_to_square(image=mask) for mask in masks]
-        image, bboxes = self.image_resizer(image=image, bounding_boxes=bboxes)
-        masks = [self.mask_resizer(image=mask) for mask in masks]
+        if self.image_size is not None:
+            # Pad to square and then Rescale image, masks and bounding boxes
+            image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
+            masks = [self.pad_to_square(image=mask) for mask in masks]
+            image, bboxes = self.image_resizer(image=image, bounding_boxes=bboxes)
+            masks = [self.mask_resizer(image=mask) for mask in masks]
+
         bboxes = bboxes.on(image)
 
         # Convert from Bouding Box Object to boxes, labels list

@@ -16,8 +16,8 @@ from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 class LabelmeDataset(Dataset):
     def __init__(
         self,
-        dirname: str = None,
-        image_size: Tuple[int, int] = (800, 800),
+        dirnames: List[str] = None,
+        image_size: Optional[Tuple[int, int]] = (800, 800),
         image_patterns: List[str] = ['*.jpg'],
         label_patterns: List[str] = ['*.xml'],
         classes: Dict[str, int] = None,
@@ -27,72 +27,93 @@ class LabelmeDataset(Dataset):
     ) -> None:
         super(LabelmeDataset, self).__init__()
         self.classes = classes
+        self.image_size = image_size
         self.std = torch.tensor(std, dtype=torch.float).view(3, 1, 1)
         self.mean = torch.tensor(mean, dtype=torch.float).view(3, 1, 1)
 
         self.transforms = transforms if transforms else []
 
         image_paths, label_paths = [], []
-        for image_pattern in image_patterns:
-            image_paths.extend(Path(dirname).glob('**/{}'.format(image_pattern)))
-        for label_pattern in label_patterns:
-            label_paths.extend(Path(dirname).glob('**/{}'.format(label_pattern)))
+        for dirname in dirnames:
+            for image_pattern in image_patterns:
+                image_paths.extend(Path(dirname).glob('**/{}'.format(image_pattern)))
+            for label_pattern in label_patterns:
+                label_paths.extend(Path(dirname).glob('**/{}'.format(label_pattern)))
 
         image_paths = natsorted(image_paths, key=lambda x: str(x.stem))
         label_paths = natsorted(label_paths, key=lambda x: str(x.stem))
 
-        self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths)]
+        self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths) if image.stem == label.stem]
 
         self.pad_to_square = iaa.PadToSquare(position='right-bottom', pad_cval=0)
-        self.image_resizer = iaa.Resize(size=image_size, interpolation='cubic')
-        self.mask_resizer = iaa.Resize(size=image_size, interpolation='nearest')
+        if image_size is not None:
+            self.image_resizer = iaa.Resize(size=image_size, interpolation='cubic')
+            self.mask_resizer = iaa.Resize(size=image_size, interpolation='nearest')
 
-        print(f'{Path(dirname).stem}: {len(self.data_pairs)}')
+        print(f'{Path(dirnames[0]).stem}: {len(self.data_pairs)}')
 
     def __len__(self):
         return len(self.data_pairs)
 
-    def _get_labelme_info(self, label_path: str, classes: dict) -> Dict:
+    def to_4points(self, points: List[Tuple[float, float]]) -> List[Tuple[float, float]]:
+        x1, y1 = points[0][0], points[0][1]
+        x2, y2 = points[1][0], points[1][1]
+        return [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]
+
+    def get_annotation(self, label_path: str, classes: dict) -> Dict:
         with open(file=label_path, mode='r', encoding='utf-8') as f:
             json_info = json.load(f)
-        width, height = int(json_info['imageWidth']), int(json_info['imageHeight'])
+        w, h = int(json_info['imageWidth']), int(json_info['imageHeight'])
 
-        label_info = []
+        annots = []
         for shape in json_info['shapes']:
-            label = shape['label']
-            points = shape['points']
-            if label in self.classes and len(points) > 0:
-                x1 = min([point[0] for point in points])
-                y1 = min([point[1] for point in points])
-                x2 = max([point[0] for point in points])
-                y2 = max([point[1] for point in points])
-                bbox = (x1, y1, x2, y2)
+            if shape['label'] not in self.classes:
+                continue
 
-                mask = np.zeros(shape=(height, width), dtype=np.uint8)
-                cv2.fillPoly(img=mask, pts=np.int32([points]), color=1)
+            if shape['shape_type'] == 'polygon':
+                points = shape['points']
+            elif shape['shape_type'] == 'rectangle':
+                points = self.to_4points(shape['points'])
+            else:
+                continue
 
-                label_info.append({'mask': mask, 'label': self.classes[label], 'bbox': bbox})
+            x1 = min([point[0] for point in points])
+            y1 = min([point[1] for point in points])
+            x2 = max([point[0] for point in points])
+            y2 = max([point[1] for point in points])
 
-        if not len(label_info):
-            label_info.append(
+            if w >= x2 > x1 and h >= y2 > y1:
+                mask = np.zeros(shape=(h, w), dtype=np.uint8)
+
+                annots.append(
+                    {
+                        'mask': cv2.fillPoly(img=mask, pts=np.int32([points]), color=1),
+                        'label': self.classes[shape['label']],
+                        'box': (x1, y1, x2, y2)
+                    }
+                )
+
+        if not len(annots):
+            annots.append(
                 {
-                    'mask': np.zeros(shape=(height, width), dtype=np.uint8),
+                    'mask': np.zeros(shape=(h, w), dtype=np.uint8),
                     'label': -1,
-                    'bbox': (0, 0, 1, 1)
+                    'box': (0, 0, 1, 1)
                 }
             )
 
-        return label_info
+        return annots
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, Dict, Tuple[str, Tuple[int, int]]]:
         image_path, label_path = self.data_pairs[idx]
-        label_info = self._get_labelme_info(label_path=str(label_path), classes=self.classes)
 
         image = cv2.imread(str(image_path))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        boxes = [label['bbox'] for label in label_info]
-        labels = [label['label'] for label in label_info]
-        masks = [label['mask'] for label in label_info]
+
+        annots = self.get_annotation(label_path=str(label_path), classes=self.classes)
+        boxes = [annot['box'] for annot in annots]
+        labels = [annot['label'] for annot in annots]
+        masks = [annot['mask'] for annot in annots]
 
         image_info = (str(image_path), image.shape[1::-1])  # image path, (w, h)
 
@@ -118,11 +139,13 @@ class LabelmeDataset(Dataset):
 
         masks = [mask.get_arr() for mask in masks]
 
-        # Pad to square and then Rescale image, masks and bounding boxes
-        image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
-        masks = [self.pad_to_square(image=mask) for mask in masks]
-        image, bboxes = self.image_resizer(image=image, bounding_boxes=bboxes)
-        masks = [self.mask_resizer(image=mask) for mask in masks]
+        if self.image_size is not None:
+            # Pad to square and then Rescale image, masks and bounding boxes
+            image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
+            masks = [self.pad_to_square(image=mask) for mask in masks]
+            image, bboxes = self.image_resizer(image=image, bounding_boxes=bboxes)
+            masks = [self.mask_resizer(image=mask) for mask in masks]
+
         bboxes = bboxes.on(image)
 
         # Convert from Bouding Box Object to boxes, labels list

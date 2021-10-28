@@ -7,7 +7,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''../efficient_det_pytorch/dataset/EKYCs/test'''
+          dirnames:
+            - '''../efficient_det_pytorch/dataset/EKYCs/test'''
           classes:
             BLX: 1
             BLX_BACK: 2

@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from natsort import natsorted
 from torch.utils.data import Dataset
-from typing import Dict, List, Optional
+from typing import Dict, Tuple, List, Optional
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 
@@ -22,7 +22,7 @@ class PascalDataset(Dataset):
         classes: Dict[str, int] = None,
         mean: List[float] = [0.485, 0.456, 0.406],
         std: List[float] = [0.229, 0.224, 0.225],
-        # image_size: int = 800,
+        image_size: Optional[Tuple[int, int]] = (800, 800),
         transforms: Optional[List] = None
     ):
         super(PascalDataset, self).__init__()
@@ -61,7 +61,7 @@ class PascalDataset(Dataset):
     def __len__(self):
         return len(self.data_pairs)
 
-    def _get_label_info(self, label_path):
+    def get_annotation(self, label_path):
         tree = ET.parse(str(label_path))
         image_info = {
             'image_name': tree.find('filename').text,
@@ -89,7 +89,7 @@ class PascalDataset(Dataset):
 
     def __getitem__(self, idx):
         image_path, label_path = self.data_pairs[idx]
-        _, label_info = self._get_label_info(label_path)
+        _, label_info = self.get_annotation(label_path)
 
         image = cv2.imread(str(image_path))
         image_info = [str(image_path), image.shape[1::-1]]

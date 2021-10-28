@@ -7,7 +7,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
+          dirnames:
+            - '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2
@@ -49,7 +50,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
+          dirnames:
+            - '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/train'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2
@@ -79,7 +81,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/valid'''
+          dirnames:
+            - '''../../semantic_segmentation_pytorch/dataset/VEHICLE_REGISTRATION/valid'''
           classes:
             DKX_BACK_TYPE_1: 1
             DKX_TYPE_1: 2

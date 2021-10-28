@@ -7,7 +7,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''dataset/CAR_INSPECTION/train'''
+          dirnames:
+            - '''dataset/CAR_INSPECTION/train'''
           classes:
             DKIX_COVER_1: 1
             DKIX_COVER_2: 2
@@ -45,7 +46,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''dataset/CAR_INSPECTION/train'''
+          dirnames:
+            - '''dataset/CAR_INSPECTION/train'''
           classes:
             DKIX_COVER_1: 1
             DKIX_COVER_2: 2
@@ -71,7 +73,8 @@ data:
         module: flame.core.data.labelme_dataset
         class: LabelmeDataset
         LabelmeDataset:
-          dirname: '''dataset/CAR_INSPECTION/valid'''
+          dirnames:
+            - '''dataset/CAR_INSPECTION/valid'''
           classes:
             DKIX_COVER_1: 1
             DKIX_COVER_2: 2

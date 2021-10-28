@@ -13,7 +13,7 @@ class MaskPredictor(Module):
     def __init__(
         self,
         alpha: float = 0.3,
-        image_size: Tuple[int, int] = (800, 800),  # w, h
+        image_size: Optional[Tuple[int, int]] = (800, 800),  # w, h
         evaluator_name: str = None,
         classes: Dict[str, List] = None,
         score_threshold: Optional[float] = None,
@@ -88,7 +88,9 @@ class MaskPredictor(Module):
             if self.use_pad_to_square:
                 original_size = (max(original_size), max(original_size))
 
-            fx, fy = original_size[0] / self.image_size[0], original_size[1] / self.image_size[1]
+            fx, fy = 1, 1
+            if self.image_size is not None:
+                fx, fy = original_size[0] / self.image_size[0], original_size[1] / self.image_size[1]
 
             for (label, box, score, mask) in zip(labels, boxes, scores, masks):
                 if label == 0:
@@ -119,8 +121,9 @@ class MaskPredictor(Module):
                     color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
                 )
 
-                mask = cv2.resize(mask, dsize=original_size, interpolation=cv2.INTER_NEAREST)
-                mask = mask[:image.shape[0], :image.shape[1]]
+                if self.image_size is not None:
+                    mask = cv2.resize(mask, dsize=original_size, interpolation=cv2.INTER_NEAREST)
+                    mask = mask[:image.shape[0], :image.shape[1]]
 
                 image[mask == 1] = (
                     image[mask == 1] * (1. - self.alpha) + np.array(color, dtype=np.float) * self.alpha

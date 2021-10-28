@@ -7,7 +7,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/NAME_CARD/train'''
+          dirnames:
+            - '''dataset/NAME_CARD/train'''
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)
@@ -42,7 +43,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/NAME_CARD/train'''
+          dirnames:
+            - '''dataset/NAME_CARD/train'''
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)
@@ -65,7 +67,8 @@ data:
         module: flame.core.data.altheia_dataset
         class: AltheiaDataset
         AltheiaDataset:
-          dirname: '''dataset/NAME_CARD/valid'''
+          dirnames:
+            - '''dataset/NAME_CARD/valid'''
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)
