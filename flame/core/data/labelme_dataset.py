@@ -60,8 +60,8 @@ class LabelmeDataset(Dataset):
         x2, y2 = points[1][0], points[1][1]
         return [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]
 
-    def get_annotation(self, label_path: str, classes: dict) -> Dict:
-        with open(file=label_path, mode='r', encoding='utf-8') as f:
+    def get_annotation(self, label_path: Path, classes: dict) -> Dict:
+        with label_path.open(mode='r', encoding='utf-8') as f:
             json_info = json.load(f)
         w, h = int(json_info['imageWidth']), int(json_info['imageHeight'])
 
@@ -108,16 +108,17 @@ class LabelmeDataset(Dataset):
         image_path, label_path = self.data_pairs[idx]
 
         image = cv2.imread(str(image_path))
+        print(image_path, image.shape)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        annots = self.get_annotation(label_path=str(label_path), classes=self.classes)
+        annots = self.get_annotation(label_path=label_path, classes=self.classes)
         boxes = [annot['box'] for annot in annots]
         labels = [annot['label'] for annot in annots]
         masks = [annot['mask'] for annot in annots]
 
         image_info = (str(image_path), image.shape[1::-1])  # image path, (w, h)
 
-        # create BoundingBoxesOnImage
+        # Create BoundingBoxesOnImage
         bboxes = BoundingBoxesOnImage(
             bounding_boxes=[
                 BoundingBox(x1=box[0], y1=box[1], x2=box[2], y2=box[3], label=label)
@@ -126,7 +127,7 @@ class LabelmeDataset(Dataset):
             shape=image.shape
         )
 
-        # create SegmentationMapsOnImage
+        # Create SegmentationMapsOnImage
         masks = [
             SegmentationMapsOnImage(arr=mask, shape=image.shape[:2])
             for mask in masks

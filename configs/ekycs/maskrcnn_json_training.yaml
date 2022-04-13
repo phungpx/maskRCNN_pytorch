@@ -8,37 +8,55 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
-            - '''dataset/SCENE_TEXT/totaltext/train'''
-            # - '''dataset/SCENE_TEXT/TD500/train'''
+            - '''dataset/CARD_DETECTION/train'''
           classes:
-            word: 1
-          image_size: None
+            BLX: 1
+            BLX_BACK: 2
+            BLX_OLD: 3
+            BLX_BACK_OLD: 4
+            CMND: 5
+            CMND_BACK: 6
+            CCCD: 7
+            CCCD_BACK: 8
+            CMCC: 9
+            CCCD_front_chip: 10
+            CCCD_back_chip: 11
+            CMQD_A: 12
+            CMQD_A_BACK: 13
+            CMQD_B: 14
+            CMQD_B_BACK: 15
+            CMQD_C: 16
+            CMQD_C_BACK: 17
+            CMQD_D: 18
+            CMQD_D_BACK: 19
+            CMQD_B_VT: 20
+            CMQD_B_VT_BACK: 21
+            PASSPORT: 22
+            PASSPORT_OTHER: 23
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
           transforms:
             - iaa.MotionBlur()
-            # - iaa.ChangeColorTemperature()
-            # - iaa.GaussianBlur(sigma=(0, 1))
-            # - iaa.Grayscale(alpha=(0.0, 1.0))
-            # - iaa.Add(value=(-50, 50), per_channel=True)
+            - iaa.ChangeColorTemperature()
+            - iaa.GaussianBlur(sigma=(0, 1))
+            - iaa.Grayscale(alpha=(0.0, 1.0))
+            - iaa.Add(value=(-50, 50), per_channel=True)
             - iaa.Fliplr(p=0.5)
-            # - iaa.Flipud(p=0.5)
-            # - iaa.Crop(percent=(0, 0.1))
-            # - iaa.Pad(percent=(0, 0.1), keep_size=False)
-            # - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
-            # - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 8
+            - iaa.Flipud(p=0.5)
+            - iaa.Crop(percent=(0, 0.1))
+            - iaa.Pad(percent=(0, 0.1), keep_size=False)
+            - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
+            - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
+      batch_size: 4
       shuffle: True
       num_workers: 12
       pin_memory: True
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
-
+  
   train_eval:
     module: torch.utils.data
     class: DataLoader
@@ -48,25 +66,43 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
-            - '''dataset/SCENE_TEXT/totaltext/train'''
-            # - '''dataset/SCENE_TEXT/TD500/train'''
+            - '''dataset/CARD_DETECTION/train'''
           classes:
-            word: 1
-          image_size: None
+            BLX: 1
+            BLX_BACK: 2
+            BLX_OLD: 3
+            BLX_BACK_OLD: 4
+            CMND: 5
+            CMND_BACK: 6
+            CCCD: 7
+            CCCD_BACK: 8
+            CMCC: 9
+            CCCD_front_chip: 10
+            CCCD_back_chip: 11
+            CMQD_A: 12
+            CMQD_A_BACK: 13
+            CMQD_B: 14
+            CMQD_B_BACK: 15
+            CMQD_C: 16
+            CMQD_C_BACK: 17
+            CMQD_D: 18
+            CMQD_D_BACK: 19
+            CMQD_B_VT: 20
+            CMQD_B_VT_BACK: 21
+            PASSPORT: 22
+            PASSPORT_OTHER: 23
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 8
+      batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
-
+  
   valid:
     module: torch.utils.data
     class: DataLoader
@@ -76,18 +112,37 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
-            - '''dataset/SCENE_TEXT/totaltext/valid'''
-            # - '''dataset/SCENE_TEXT/TD500/test'''
+            - '''dataset/CARD_DETECTION/valid'''
           classes:
-            word: 1
-          image_size: None
+            BLX: 1
+            BLX_BACK: 2
+            BLX_OLD: 3
+            BLX_BACK_OLD: 4
+            CMND: 5
+            CMND_BACK: 6
+            CCCD: 7
+            CCCD_BACK: 8
+            CMCC: 9
+            CCCD_front_chip: 10
+            CCCD_back_chip: 11
+            CMQD_A: 12
+            CMQD_A_BACK: 13
+            CMQD_B: 14
+            CMQD_B_BACK: 15
+            CMQD_C: 16
+            CMQD_C_BACK: 17
+            CMQD_D: 18
+            CMQD_D_BACK: 19
+            CMQD_B_VT: 20
+            CMQD_B_VT_BACK: 21
+            PASSPORT: 22
+            PASSPORT_OTHER: 23
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 8
+      batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -98,9 +153,9 @@ model:
   module: flame.core.model.maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
-    num_classes: 2
+    num_classes: 24
     pretrained: True
-    pretrained_backbone: True
+    pretrained_backbone: False
     score_threshold: 0.2
     nms_threshold: 0.2
 
@@ -109,7 +164,7 @@ optim:
   class: SGD
   SGD:
     params: config['model'].parameters()
-    lr: 0.01
+    lr: 0.005
     momentum: 0.95
     weight_decay: 0.0005
 
@@ -141,7 +196,29 @@ metrics:
             class: MeanAveragePrecision
             MeanAveragePrecision:
               classes:
-                word: 1
+                BLX: 1
+                BLX_BACK: 2
+                BLX_OLD: 3
+                BLX_BACK_OLD: 4
+                CMND: 5
+                CMND_BACK: 6
+                CCCD: 7
+                CCCD_BACK: 8
+                CMCC: 9
+                CCCD_front_chip: 10
+                CCCD_back_chip: 11
+                CMQD_A: 12
+                CMQD_A_BACK: 13
+                CMQD_B: 14
+                CMQD_B_BACK: 15
+                CMQD_C: 16
+                CMQD_C_BACK: 17
+                CMQD_D: 18
+                CMQD_D_BACK: 19
+                CMQD_B_VT: 20
+                CMQD_B_VT_BACK: 21
+                PASSPORT: 22
+                PASSPORT_OTHER: 23
               iou_threshold: 0.5
               verbose: False
               method: '''every_point_interpolation'''
@@ -190,13 +267,13 @@ early_stopping:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 10
+    patience: 5
 
 best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/'''
+    dirname: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -213,7 +290,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/'''
+    dirname: '''checkpoint/EKYCs/maskrcnn_resnet50fpn/'''
     save_interval: 1
     n_saved: 1
 

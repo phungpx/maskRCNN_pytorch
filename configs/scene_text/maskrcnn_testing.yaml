@@ -8,8 +8,8 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
-            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
+            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
+            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
             - '''dataset/SCENE_TEXT/totaltext/valid'''
           classes:
             word: 1
@@ -68,7 +68,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281642/best_model_35_mAP=0.6802.pt'''
+    checkpoint_path: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/2110300810/best_model_18_mAP=0.8159.pt'''
     mode: '''test'''
 
 predictor:
@@ -76,7 +76,7 @@ predictor:
   class: MaskPredictor
   MaskPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/2110281642/best_model_35_mAP=0.6802/test'''
+    output_dir: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/2110300810/best_model_18_mAP=0.8159/valid'''
     classes:
       word: [[0, 255, 0], 1]
     alpha: 0.3
