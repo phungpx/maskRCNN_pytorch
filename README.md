@@ -1,18 +1,9 @@
 # MaskRCNN
 
 # Papers
-1. Fast RCNN
-```bash
-https://arxiv.org/pdf/1504.08083.pdf
-```
-2. Faster RCNN: Towards Real-Time Object Detection with Region Proposal Networks
-```bash
-https://arxiv.org/pdf/1506.01497.pdf
-```
-3. Mask RCNN
-```bash
-https://arxiv.org/pdf/1703.06870.pdf
-```
+1. [Fast RCNN](https://arxiv.org/pdf/1504.08083.pdf)
+2. [Faster RCNN: Towards Real-Time Object Detection with Region Proposal Networks](https://arxiv.org/pdf/1506.01497.pdf)
+3. [Mask RCNN](https://arxiv.org/pdf/1703.06870.pdf)
 
 # Documents
 1. The best explanation, I've ever read.
