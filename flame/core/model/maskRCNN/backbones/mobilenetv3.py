@@ -5,9 +5,9 @@ from typing import Any, Callable, List, Optional, Sequence, Tuple
 import torch
 from torch import nn, Tensor
 
-from torchvision.transforms import InterpolationMode
 # from torchvision.ops.misc import ConvNormActivation, SqueezeExcitation as SElayer
 
+from ..functions._utils import InterpolationMode
 from ..functions._api import _log_api_usage_once
 from ..functions._api import WeightsEnum, Weights
 from ..functions._meta import _IMAGENET_CATEGORIES

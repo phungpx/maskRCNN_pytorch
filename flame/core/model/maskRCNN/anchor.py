@@ -143,6 +143,7 @@ class AnchorGenerator(nn.Module):
         for _ in range(len(image_list.image_sizes)):
             anchors_in_image = [anchors_per_feature_map for anchors_per_feature_map in anchors_over_all_feature_maps]
             anchors.append(anchors_in_image)
+
         anchors = [torch.cat(anchors_per_image) for anchors_per_image in anchors]
 
         return anchors

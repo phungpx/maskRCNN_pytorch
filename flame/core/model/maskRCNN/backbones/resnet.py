@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torchvision.transforms import InterpolationMode
+from ..functions._utils import InterpolationMode
 
 from ..functions._api import _log_api_usage_once
 from ..functions._api import WeightsEnum, Weights

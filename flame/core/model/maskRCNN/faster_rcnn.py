@@ -4,8 +4,8 @@ import torch
 import torch.nn.functional as F
 from torch import nn, Tensor
 from torchvision.ops import MultiScaleRoIAlign
-from torchvision.transforms import InterpolationMode
 
+from .functions._utils import InterpolationMode
 from .functions import misc as misc_nn_ops
 from .functions.utils import overwrite_eps
 from .functions._meta import _COCO_CATEGORIES
@@ -247,7 +247,11 @@ class FasterRCNN(GeneralizedRCNN):
         )
 
         if box_roi_pool is None:
-            box_roi_pool = MultiScaleRoIAlign(featmap_names=["0", "1", "2", "3"], output_size=7, sampling_ratio=2)
+            box_roi_pool = MultiScaleRoIAlign(
+                featmap_names=["0", "1", "2", "3"],
+                output_size=7,
+                sampling_ratio=2
+            )
 
         if box_head is None:
             resolution = box_roi_pool.output_size[0]
@@ -604,16 +608,10 @@ def _fasterrcnn_mobilenet_v3_large_fpn(
 
     backbone = mobilenet_v3_large(weights=weights_backbone, progress=progress, norm_layer=norm_layer)
     backbone = _mobilenet_extractor(backbone, True, trainable_backbone_layers)
-    anchor_sizes = (
-        (
-            32,
-            64,
-            128,
-            256,
-            512,
-        ),
-    ) * 3
+
+    anchor_sizes = ((32, 64, 128, 256, 512,),) * 3
     aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
+
     model = FasterRCNN(
         backbone, num_classes, rpn_anchor_generator=AnchorGenerator(anchor_sizes, aspect_ratios), **kwargs
     )

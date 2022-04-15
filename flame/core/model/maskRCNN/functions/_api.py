@@ -8,7 +8,10 @@ from collections import OrderedDict
 from dataclasses import dataclass, fields
 from typing import Any, Callable, Dict, cast, TypeVar, Type
 
-from torchvision._internally_replaced_utils import load_state_dict_from_url
+try:
+    from torch.hub import load_state_dict_from_url  # noqa: 401
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url  # noqa: 401
 
 
 __all__ = ["StrEnumMeta", "StrEnum", "WeightsEnum", "Weights", "get_weight"]

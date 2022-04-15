@@ -5,7 +5,8 @@ from typing import Dict, List, Optional, Tuple
 import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
-from torchvision.ops import FrozenBatchNorm2d, generalized_box_iou_loss
+from .giou_loss import generalized_box_iou_loss
+from .misc import FrozenBatchNorm2d
 
 
 class BalancedPositiveNegativeSampler:
