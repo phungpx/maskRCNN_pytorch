@@ -1,11 +1,11 @@
 from torch import nn
-from maskRCNN.anchor import AnchorGenerator
-from maskRCNN.faster_rcnn import FasterRCNN
-from maskRCNN.utils.block_utils import FrozenBatchNorm2d
-from maskRCNN.utils._utils import _ovewrite_value_param
-from maskRCNN.backbones.mobilenetv3 import mobilenet_v3_large, MobileNet_V3_Large_Weights
-from maskRCNN.backbones.backbone import _mobilenet_extractor, _validate_trainable_layers
-from maskRCNN.faster_rcnn import fasterrcnn_mobilenet_v3_large_fpn, FasterRCNN_MobileNet_V3_Large_FPN_Weights
+from .maskRCNN.anchor import AnchorGenerator
+from .maskRCNN.faster_rcnn import FasterRCNN
+from .maskRCNN.utils.block_utils import FrozenBatchNorm2d
+from .maskRCNN.utils._utils import _ovewrite_value_param
+from .maskRCNN.backbones.mobilenetv3 import mobilenet_v3_large, MobileNet_V3_Large_Weights
+from .maskRCNN.backbones.backbone import _mobilenet_extractor, _validate_trainable_layers
+from .maskRCNN.faster_rcnn import fasterrcnn_mobilenet_v3_large_fpn, FasterRCNN_MobileNet_V3_Large_FPN_Weights
 
 from typing import Optional, Tuple, Any
 
@@ -13,8 +13,8 @@ from typing import Optional, Tuple, Any
 class FasterRCNNMobileNetV3LargeFPN(nn.Module):
     def __init__(
         self,
-        weights: Optional[FasterRCNN_MobileNet_V3_Large_FPN_Weights] = None,
-        weights_backbone: Optional[MobileNet_V3_Large_Weights] = None,
+        pretrained: bool = False,
+        backbone_pretrained: bool = False,
         num_classes: int = None,
         progress: bool = True,
         trainable_backbone_layers: Optional[int] = None,
@@ -35,8 +35,14 @@ class FasterRCNNMobileNetV3LargeFPN(nn.Module):
         **kwargs: Any,
     ):
         super(FasterRCNNMobileNetV3LargeFPN, self).__init__()
-        weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.verify(weights)
-        weights_backbone = MobileNet_V3_Large_Weights.verify(weights_backbone)
+
+        weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.verify(
+            FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1
+        ) if pretrained else None
+
+        weights_backbone = MobileNet_V3_Large_Weights.verify(
+            MobileNet_V3_Large_Weights.IMAGENET1K_V1
+        ) if backbone_pretrained else None
 
         if weights is not None:
             weights_backbone = None
@@ -44,7 +50,7 @@ class FasterRCNNMobileNetV3LargeFPN(nn.Module):
         elif num_classes is None:
             num_classes = 91
 
-        is_trained = weights is not None or weights_backbone is not None
+        is_trained = (weights is not None) or (weights_backbone is not None)
         trainable_backbone_layers = _validate_trainable_layers(is_trained, trainable_backbone_layers, 6, 3)
         norm_layer = FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
 
@@ -87,7 +93,17 @@ if __name__ == "__main__":
     import torch
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = FasterRCNNMobileNetV3LargeFPN(weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1)
+    model = FasterRCNNMobileNetV3LargeFPN(
+        # weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1,
+        # weights_backbone=MobileNet_V3_Large_Weights.IMAGENET1K_V1,
+        # num_classes=2,
+        # Anchors parameters
+        anchor_sizes=((32, 64, 128, 256, 512,),) * 3,
+        aspect_ratios=((0.25, 0.5, 1.0, 2.0, 4.0),) * 3,
+        # Box parameters
+        box_score_thresh=0.05,
+        box_nms_thresh=0.5,
+    )
     model.eval().to(device)
     print(f'Params: {sum(p.numel() for p in model.parameters() if p.requires_grad)}')
 
@@ -102,4 +118,4 @@ if __name__ == "__main__":
     t2 = time.time()
 
     print(t2 - t1)
-    print(preds)
+    # print(preds)

@@ -108,7 +108,6 @@ class LabelmeDataset(Dataset):
         image_path, label_path = self.data_pairs[idx]
 
         image = cv2.imread(str(image_path))
-        print(image_path, image.shape)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         annots = self.get_annotation(label_path=label_path, classes=self.classes)
