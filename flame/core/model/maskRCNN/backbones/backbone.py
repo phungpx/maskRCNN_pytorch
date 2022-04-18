@@ -3,14 +3,14 @@ from typing import Callable, Dict, List, Optional, Union
 
 from torch import nn, Tensor
 
-from torchvision.ops import misc as misc_nn_ops
-from torchvision.ops.feature_pyramid_network import ExtraFPNBlock, FeaturePyramidNetwork, LastLevelMaxPool
 
-from torchvision.models import mobilenet, resnet
-from torchvision.models._utils import IntermediateLayerGetter
+from . import resnet
+from . import mobilenet
+from ._api import WeightsEnum, get_enum_from_fn
+from .block_utils import IntermediateLayerGetter, FrozenBatchNorm2d
+from .feature_pyramid_network import ExtraFPNBlock, FeaturePyramidNetwork, LastLevelMaxPool
 
-from ..functions._utils import handle_legacy_interface
-from ..functions._api import WeightsEnum, get_enum_from_fn
+from ._utils import handle_legacy_interface
 
 
 class BackboneWithFPN(nn.Module):
@@ -72,7 +72,7 @@ def resnet_fpn_backbone(
     *,
     backbone_name: str,
     weights: Optional[WeightsEnum],
-    norm_layer: Callable[..., nn.Module] = misc_nn_ops.FrozenBatchNorm2d,
+    norm_layer: Callable[..., nn.Module] = FrozenBatchNorm2d,
     trainable_layers: int = 3,
     returned_layers: Optional[List[int]] = None,
     extra_blocks: Optional[ExtraFPNBlock] = None,
@@ -185,7 +185,7 @@ def mobilenet_backbone(
     backbone_name: str,
     weights: Optional[WeightsEnum],
     fpn: bool,
-    norm_layer: Callable[..., nn.Module] = misc_nn_ops.FrozenBatchNorm2d,
+    norm_layer: Callable[..., nn.Module] = FrozenBatchNorm2d,
     trainable_layers: int = 2,
     returned_layers: Optional[List[int]] = None,
     extra_blocks: Optional[ExtraFPNBlock] = None,

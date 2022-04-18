@@ -2,15 +2,12 @@ from functools import partial
 from typing import Type, Any, Callable, Union, List, Optional, Tuple
 
 import torch
-import torch.nn as nn
+from torch import nn, Tensor
 
-from torch import Tensor
-from ..functions._utils import InterpolationMode
-
-from ..functions._api import _log_api_usage_once
-from ..functions._api import WeightsEnum, Weights
-from ..functions._meta import _IMAGENET_CATEGORIES
-from ..functions._utils import handle_legacy_interface, _ovewrite_named_param
+from .block_utils import InterpolationMode
+from ._meta import _IMAGENET_CATEGORIES
+from ._api import _log_api_usage_once, WeightsEnum, Weights
+from ._utils import handle_legacy_interface, _ovewrite_named_param
 
 
 __all__ = [

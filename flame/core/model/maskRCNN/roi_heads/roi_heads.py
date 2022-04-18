@@ -1,12 +1,13 @@
 from typing import Optional, List, Dict, Tuple
 
 import torch
-import torch.nn.functional as F
 import torchvision
 from torch import nn, Tensor
-from torchvision.ops import boxes as box_ops, roi_align
+import torch.nn.functional as F
 
-from .functions import utils as det_utils
+from torchvision.ops import boxes as box_ops
+from .box_utils import BalancedPositiveNegativeSampler, BoxCoder, Matcher
+from ..roi_align.roi_align import roi_align
 
 
 def fastrcnn_loss(class_logits, box_regression, labels, regression_targets):
@@ -486,9 +487,9 @@ def paste_masks_in_image(masks, boxes, img_shape, padding=1):
 
 class RoIHeads(nn.Module):
     __annotations__ = {
-        "box_coder": det_utils.BoxCoder,
-        "proposal_matcher": det_utils.Matcher,
-        "fg_bg_sampler": det_utils.BalancedPositiveNegativeSampler,
+        "box_coder": BoxCoder,
+        "proposal_matcher": Matcher,
+        "fg_bg_sampler": BalancedPositiveNegativeSampler,
     }
 
     def __init__(
@@ -518,13 +519,13 @@ class RoIHeads(nn.Module):
 
         self.box_similarity = box_ops.box_iou
         # assign ground-truth boxes for each proposal
-        self.proposal_matcher = det_utils.Matcher(fg_iou_thresh, bg_iou_thresh, allow_low_quality_matches=False)
+        self.proposal_matcher = Matcher(fg_iou_thresh, bg_iou_thresh, allow_low_quality_matches=False)
 
-        self.fg_bg_sampler = det_utils.BalancedPositiveNegativeSampler(batch_size_per_image, positive_fraction)
+        self.fg_bg_sampler = BalancedPositiveNegativeSampler(batch_size_per_image, positive_fraction)
 
         if bbox_reg_weights is None:
             bbox_reg_weights = (10.0, 10.0, 5.0, 5.0)
-        self.box_coder = det_utils.BoxCoder(bbox_reg_weights)
+        self.box_coder = BoxCoder(bbox_reg_weights)
 
         self.box_roi_pool = box_roi_pool
         self.box_head = box_head

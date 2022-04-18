@@ -1,10 +1,10 @@
 from torch import nn
 from maskRCNN.anchor import AnchorGenerator
 from maskRCNN.faster_rcnn import FasterRCNN
-from maskRCNN.functions import misc as misc_nn_ops
-from maskRCNN.functions._utils import _ovewrite_value_param
+from maskRCNN.utils.block_utils import FrozenBatchNorm2d
+from maskRCNN.utils._utils import _ovewrite_value_param
 from maskRCNN.backbones.mobilenetv3 import mobilenet_v3_large, MobileNet_V3_Large_Weights
-from maskRCNN.backbones.backbone_utils import _mobilenet_extractor, _validate_trainable_layers
+from maskRCNN.backbones.backbone import _mobilenet_extractor, _validate_trainable_layers
 from maskRCNN.faster_rcnn import fasterrcnn_mobilenet_v3_large_fpn, FasterRCNN_MobileNet_V3_Large_FPN_Weights
 
 from typing import Optional, Tuple, Any
@@ -46,7 +46,7 @@ class FasterRCNNMobileNetV3LargeFPN(nn.Module):
 
         is_trained = weights is not None or weights_backbone is not None
         trainable_backbone_layers = _validate_trainable_layers(is_trained, trainable_backbone_layers, 6, 3)
-        norm_layer = misc_nn_ops.FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
+        norm_layer = FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
 
         backbone = mobilenet_v3_large(weights=weights_backbone, progress=progress, norm_layer=norm_layer)
         backbone = _mobilenet_extractor(backbone, True, trainable_backbone_layers)

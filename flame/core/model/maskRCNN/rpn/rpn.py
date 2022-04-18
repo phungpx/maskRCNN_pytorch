@@ -5,11 +5,11 @@ from torch import nn, Tensor
 from torch.nn import functional as F
 from torchvision.ops import boxes as box_ops
 
-from .functions import utils as det_utils
-from .functions.misc import Conv2dNormActivation
+from .box_utils import _topk_min, BalancedPositiveNegativeSampler, BoxCoder, Matcher
 
+from ..backbones.block_utils import Conv2dNormActivation
 # Import AnchorGenerator to keep compatibility.
-from .anchor import ImageList, AnchorGenerator  # noqa: 401
+from ..anchor import ImageList, AnchorGenerator  # noqa: 401
 
 
 class RPNHead(nn.Module):
@@ -133,9 +133,9 @@ class RegionProposalNetwork(torch.nn.Module):
     """
 
     __annotations__ = {
-        "box_coder": det_utils.BoxCoder,
-        "proposal_matcher": det_utils.Matcher,
-        "fg_bg_sampler": det_utils.BalancedPositiveNegativeSampler,
+        "box_coder": BoxCoder,
+        "proposal_matcher": Matcher,
+        "fg_bg_sampler": BalancedPositiveNegativeSampler,
     }
 
     def __init__(
@@ -156,18 +156,18 @@ class RegionProposalNetwork(torch.nn.Module):
         super().__init__()
         self.anchor_generator = anchor_generator
         self.head = head
-        self.box_coder = det_utils.BoxCoder(weights=(1.0, 1.0, 1.0, 1.0))
+        self.box_coder = BoxCoder(weights=(1.0, 1.0, 1.0, 1.0))
 
         # used during training
         self.box_similarity = box_ops.box_iou
 
-        self.proposal_matcher = det_utils.Matcher(
+        self.proposal_matcher = Matcher(
             fg_iou_thresh,
             bg_iou_thresh,
             allow_low_quality_matches=True,
         )
 
-        self.fg_bg_sampler = det_utils.BalancedPositiveNegativeSampler(batch_size_per_image, positive_fraction)
+        self.fg_bg_sampler = BalancedPositiveNegativeSampler(batch_size_per_image, positive_fraction)
         # used during testing
         self._pre_nms_top_n = pre_nms_top_n
         self._post_nms_top_n = post_nms_top_n
@@ -228,7 +228,7 @@ class RegionProposalNetwork(torch.nn.Module):
         offset = 0
         for ob in objectness.split(num_anchors_per_level, 1):
             num_anchors = ob.shape[1]
-            pre_nms_top_n = det_utils._topk_min(ob, self.pre_nms_top_n(), 1)
+            pre_nms_top_n = _topk_min(ob, self.pre_nms_top_n(), 1)
             _, top_n_idx = ob.topk(pre_nms_top_n, dim=1)
             r.append(top_n_idx + offset)
             offset += num_anchors

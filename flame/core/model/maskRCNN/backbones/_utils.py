@@ -1,26 +1,11 @@
 import inspect
 import functools
 import warnings
-from enum import Enum
 from typing import Any, Dict, Optional, TypeVar, Callable, Tuple, Union
 
 from torch import nn
 
 from ._api import WeightsEnum
-
-
-class InterpolationMode(Enum):
-    """Interpolation modes
-    Available interpolation methods are ``nearest``, ``bilinear``, ``bicubic``, ``box``, ``hamming``, and ``lanczos``.
-    """
-
-    NEAREST = "nearest"
-    BILINEAR = "bilinear"
-    BICUBIC = "bicubic"
-    # For PIL compatibility
-    BOX = "box"
-    HAMMING = "hamming"
-    LANCZOS = "lanczos"
 
 
 D = TypeVar("D")

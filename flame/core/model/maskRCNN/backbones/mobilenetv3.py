@@ -5,14 +5,11 @@ from typing import Any, Callable, List, Optional, Sequence, Tuple
 import torch
 from torch import nn, Tensor
 
-# from torchvision.ops.misc import ConvNormActivation, SqueezeExcitation as SElayer
+from ._meta import _IMAGENET_CATEGORIES
+from ._api import _log_api_usage_once, WeightsEnum, Weights
+from .block_utils import InterpolationMode, Conv2dNormActivation, SqueezeExcitation as SElayer
 
-from ..functions._utils import InterpolationMode
-from ..functions._api import _log_api_usage_once
-from ..functions._api import WeightsEnum, Weights
-from ..functions._meta import _IMAGENET_CATEGORIES
-from ..functions.misc import Conv2dNormActivation, SqueezeExcitation as SElayer
-from ..functions._utils import handle_legacy_interface, _ovewrite_named_param, _make_divisible
+from ._utils import handle_legacy_interface, _ovewrite_named_param, _make_divisible
 
 
 __all__ = [
@@ -415,3 +412,15 @@ def mobilenet_v3_small(
 
     inverted_residual_setting, last_channel = _mobilenet_v3_conf("mobilenet_v3_small", **kwargs)
     return _mobilenet_v3(inverted_residual_setting, last_channel, weights, progress, **kwargs)
+
+
+if __name__ == "__main__":
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # model = mobilenet_v3_small(num_classes=3).to(device)
+    model = mobilenet_v3_large(num_classes=3).to(device)
+    dummy_input = torch.rand(size=[8, 3, 224, 224], dtype=torch.float32, device=device)
+    output = model(dummy_input)
+
+    print(f"Input Shape: {dummy_input.shape}")
+    print(f"Output Shape: {output.shape}")
+    print(f"Number of parameters: {sum((p.numel() for p in model.parameters() if p.requires_grad))}")

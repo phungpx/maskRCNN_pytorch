@@ -3,24 +3,26 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 import torch
 import torch.nn.functional as F
 from torch import nn, Tensor
-from torchvision.ops import MultiScaleRoIAlign
 
-from .functions._utils import InterpolationMode
-from .functions import misc as misc_nn_ops
-from .functions.utils import overwrite_eps
-from .functions._meta import _COCO_CATEGORIES
-from .functions._api import WeightsEnum, Weights
-from .functions._utils import handle_legacy_interface, _ovewrite_value_param
+from .utils._meta import _COCO_CATEGORIES
+from .utils._api import WeightsEnum, Weights
+from .utils._utils import InterpolationMode, overwrite_eps, handle_legacy_interface, _ovewrite_value_param
+from .utils.block_utils import Conv2dNormActivation, FrozenBatchNorm2d
 
 # backbones
 from .backbones.resnet import ResNet50_Weights, resnet50
 from .backbones.mobilenetv3 import MobileNet_V3_Large_Weights, mobilenet_v3_large
-from .backbones.backbone_utils import _resnet_fpn_extractor, _validate_trainable_layers, _mobilenet_extractor
-
-from .roi_heads import RoIHeads
+from .backbones.backbone import _resnet_fpn_extractor, _validate_trainable_layers, _mobilenet_extractor
+# Anchor
 from .anchor import AnchorGenerator
+# RPN
+from .rpn.rpn import RPNHead, RegionProposalNetwork
+# RoI Align
+from .roi_align.poolers import MultiScaleRoIAlign
+# RoI Head
+from .roi_heads.roi_heads import RoIHeads
+
 from .generalized_rcnn import GeneralizedRCNN
-from .rpn import RPNHead, RegionProposalNetwork
 from .transform import GeneralizedRCNNTransform
 
 
@@ -329,7 +331,7 @@ class FastRCNNConvFCHead(nn.Sequential):
         blocks = []
         previous_channels = in_channels
         for current_channels in conv_layers:
-            blocks.append(misc_nn_ops.Conv2dNormActivation(previous_channels, current_channels, norm_layer=norm_layer))
+            blocks.append(Conv2dNormActivation(previous_channels, current_channels, norm_layer=norm_layer))
             previous_channels = current_channels
         blocks.append(nn.Flatten())
         previous_channels = previous_channels * in_height * in_width
@@ -516,7 +518,7 @@ def fasterrcnn_resnet50_fpn(
 
     is_trained = weights is not None or weights_backbone is not None
     trainable_backbone_layers = _validate_trainable_layers(is_trained, trainable_backbone_layers, 5, 3)
-    norm_layer = misc_nn_ops.FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
+    norm_layer = FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
 
     backbone = resnet50(weights=weights_backbone, progress=progress, norm_layer=norm_layer)
     backbone = _resnet_fpn_extractor(backbone, trainable_backbone_layers)
@@ -604,7 +606,7 @@ def _fasterrcnn_mobilenet_v3_large_fpn(
 
     is_trained = weights is not None or weights_backbone is not None
     trainable_backbone_layers = _validate_trainable_layers(is_trained, trainable_backbone_layers, 6, 3)
-    norm_layer = misc_nn_ops.FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
+    norm_layer = FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
 
     backbone = mobilenet_v3_large(weights=weights_backbone, progress=progress, norm_layer=norm_layer)
     backbone = _mobilenet_extractor(backbone, True, trainable_backbone_layers)
