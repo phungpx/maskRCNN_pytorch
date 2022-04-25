@@ -9,7 +9,7 @@ from ignite.engine import Events
 from typing import Dict, Tuple, List, Optional
 
 
-class MaskPredictor(Module):
+class Predictor(Module):
     def __init__(
         self,
         alpha: float = 0.3,
@@ -17,21 +17,17 @@ class MaskPredictor(Module):
         image_size: Optional[Tuple[int, int]] = (800, 800),  # w, h
         evaluator_name: str = None,
         classes: Dict[str, List] = None,
-        score_threshold: Optional[float] = None,
-        iou_threshold: Optional[float] = None,
         use_pad_to_square: bool = False,
         output_dir: str = None,
         binary_threshold: float = 0.5,
         output_transform=lambda x: x
     ) -> None:
-        super(MaskPredictor, self).__init__()
+        super(Predictor, self).__init__()
         self.alpha = alpha
         self.classes = classes
         self.draw_box = draw_box
         self.image_size = image_size
-        self.iou_threshold = iou_threshold
         self.evaluator_name = evaluator_name
-        self.score_threshold = score_threshold
         self.binary_threshold = binary_threshold
         self.output_transform = output_transform
         self.use_pad_to_square = use_pad_to_square
@@ -62,23 +58,14 @@ class MaskPredictor(Module):
             labels = pred['labels']  # Int64Tensor, shape: N
             boxes = pred['boxes']  # Float32Tensor, shape: N x 4 (x1, y1, x2, y2)
             scores = pred['scores']  # Float32Tensor, shape: N
-            masks = pred['masks']  # probability map range [0, 1], Float32Tensor, shape: N x 1 x H x W
-
-            if self.score_threshold:
-                indices = scores > self.score_threshold
-                labels, boxes = labels[indices], boxes[indices]
-                scores, masks = scores[indices], masks[indices]
-
-            if self.iou_threshold:
-                indices = torchvision.ops.nms(boxes, scores, self.iou_threshold)
-                labels, boxes = labels[indices], boxes[indices]
-                scores, masks = scores[indices], masks[indices]
+            masks = pred.get('masks', None)  # probability map range [0, 1], Float32Tensor, shape: N x 1 x H x W
 
             boxes = boxes.data.cpu().numpy().tolist()
             labels = labels.data.cpu().numpy().tolist()
             scores = scores.data.cpu().numpy().tolist()
-            masks = (masks > self.binary_threshold).to(torch.uint8)  # N x 1 x H x W
-            masks = masks.squeeze(dim=1).cpu().numpy()  # N x H x W
+            if masks is not None:
+                masks = (masks > self.binary_threshold).to(torch.uint8)  # N x 1 x H x W
+                masks = masks.squeeze(dim=1).cpu().numpy()  # N x H x W
 
             if self.classes:
                 classes = {
@@ -96,7 +83,8 @@ class MaskPredictor(Module):
             if self.image_size is not None:
                 fx, fy = original_size[0] / self.image_size[0], original_size[1] / self.image_size[1]
 
-            for (label, box, score, mask) in zip(labels, boxes, scores, masks):
+            for i in range(len(labels)):
+                label, box, score = labels[i], boxes[i], scores[i]
                 if label == 0:
                     continue
 
@@ -126,19 +114,24 @@ class MaskPredictor(Module):
                         color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
                     )
 
-                if self.image_size is not None:
-                    mask = cv2.resize(mask, dsize=original_size, interpolation=cv2.INTER_NEAREST)
-                    mask = mask[:image.shape[0], :image.shape[1]]
+                if masks is not None:
+                    mask = masks[i]
 
-                mask = self._rm_small_components(mask, class_ratio=0.)
+                    if self.image_size is not None:
+                        mask = cv2.resize(mask, dsize=original_size, interpolation=cv2.INTER_NEAREST)
+                        mask = mask[:image.shape[0], :image.shape[1]]
 
-                image[mask == 1] = (
-                    image[mask == 1] * (1. - self.alpha) + np.array(color, dtype=np.float) * self.alpha
-                ).astype(np.uint8)
+                    mask = self._rm_small_components(mask, class_ratio=0.)
 
-                # draw boundary of mask
-                contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-                cv2.drawContours(image=image, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=box_thickness)
+                    image[mask == 1] = (
+                        image[mask == 1] * (1. - self.alpha) + np.array(color, dtype=np.float) * self.alpha
+                    ).astype(np.uint8)
+
+                    # draw boundary of mask
+                    contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+                    cv2.drawContours(
+                        image=image, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=box_thickness
+                    )
 
             cv2.imwrite(save_path, image)
 

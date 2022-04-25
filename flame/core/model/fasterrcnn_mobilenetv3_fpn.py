@@ -5,7 +5,7 @@ from .maskRCNN.utils.block_utils import FrozenBatchNorm2d
 from .maskRCNN.utils._utils import _ovewrite_value_param
 from .maskRCNN.backbones.mobilenetv3 import mobilenet_v3_large, MobileNet_V3_Large_Weights
 from .maskRCNN.backbones.backbone import _mobilenet_extractor, _validate_trainable_layers
-from .maskRCNN.faster_rcnn import fasterrcnn_mobilenet_v3_large_fpn, FasterRCNN_MobileNet_V3_Large_FPN_Weights
+from .maskRCNN.faster_rcnn import FasterRCNN_MobileNet_V3_Large_FPN_Weights
 
 from typing import Optional, Tuple, Any
 

@@ -292,7 +292,11 @@ class RegionProposalNetwork(torch.nn.Module):
         return final_boxes, final_scores
 
     def compute_loss(
-        self, objectness: Tensor, pred_bbox_deltas: Tensor, labels: List[Tensor], regression_targets: List[Tensor]
+        self,
+        objectness: Tensor,
+        pred_bbox_deltas: Tensor,
+        labels: List[Tensor],
+        regression_targets: List[Tensor],
     ) -> Tuple[Tensor, Tensor]:
         """
         Args:
@@ -375,7 +379,10 @@ class RegionProposalNetwork(torch.nn.Module):
             labels, matched_gt_boxes = self.assign_targets_to_anchors(anchors, targets)
             regression_targets = self.box_coder.encode(matched_gt_boxes, anchors)
             loss_objectness, loss_rpn_box_reg = self.compute_loss(
-                objectness, pred_bbox_deltas, labels, regression_targets
+                objectness=objectness,
+                pred_bbox_deltas=pred_bbox_deltas,
+                labels=labels,
+                regression_targets=regression_targets,
             )
 
             losses = {

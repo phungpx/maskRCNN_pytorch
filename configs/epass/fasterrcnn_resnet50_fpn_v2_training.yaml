@@ -15,7 +15,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -32,7 +32,7 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 64
+      batch_size: 8
       shuffle: True
       num_workers: 12
       pin_memory: True
@@ -55,12 +55,12 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 64
+      batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -83,12 +83,12 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
           label_patterns: ['''*.json''']
-      batch_size: 64
+      batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -96,18 +96,18 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.fasterrcnn_mobilenetv3_fpn
-  class: FasterRCNNMobileNetV3LargeFPN
-  FasterRCNNMobileNetV3LargeFPN:
-    # pretrained: False
-    backbone_pretrained: False
+  module: flame.core.model.fasterrcnn_resnet50_fpn_v2
+  class: FasterRCNNResNet50FPNV2
+  FasterRCNNResNet50FPNV2:
+    pretrained: False
+    backbone_pretrained: True
     num_classes: 2
     # Anchors parameters
-    anchor_sizes: '((32, 64, 128, 256, 512,),) * 3'
-    aspect_ratios: '((0.25, 0.5, 1.0, 2.0, 4.0),) * 3'
+    anchor_sizes: "((32,), (64,), (128,), (256,), (512,))"
+    aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
     # Box parameters
-    box_score_thresh: 0.2
-    box_nms_thresh: 0.2
+    box_score_thresh: 0.05
+    box_nms_thresh: 0.5
 
 optim:
   module: torch.optim
@@ -171,8 +171,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EPASS/MobilenetV3LargeFPN/2204181440/best_model_30_mAP=0.7948.pt'''
-    mode: '''retrain'''
+    checkpoint_path: ''''''
+    mode: '''train'''
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -201,7 +201,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EPASS/MobilenetV3LargeFPN/'''
+    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -218,7 +218,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EPASS/MobilenetV3LargeFPN/'''
+    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
     save_interval: 1
     n_saved: 1
 

@@ -10,7 +10,12 @@ from .box_utils import BalancedPositiveNegativeSampler, BoxCoder, Matcher
 from ..roi_align.roi_align import roi_align
 
 
-def fastrcnn_loss(class_logits, box_regression, labels, regression_targets):
+def fastrcnn_loss(
+    class_logits,
+    box_regression,
+    labels,
+    regression_targets
+):
     # type: (Tensor, Tensor, List[Tensor], List[Tensor]) -> Tuple[Tensor, Tensor]
     """
     Computes the loss for Faster R-CNN.
@@ -122,40 +127,40 @@ def maskrcnn_loss(mask_logits, proposals, gt_masks, gt_labels, mask_matched_idxs
     return mask_loss
 
 
-def keypoints_to_heatmap(keypoints, rois, heatmap_size):
-    # type: (Tensor, Tensor, int) -> Tuple[Tensor, Tensor]
-    offset_x = rois[:, 0]
-    offset_y = rois[:, 1]
-    scale_x = heatmap_size / (rois[:, 2] - rois[:, 0])
-    scale_y = heatmap_size / (rois[:, 3] - rois[:, 1])
+# def keypoints_to_heatmap(keypoints, rois, heatmap_size):
+#     # type: (Tensor, Tensor, int) -> Tuple[Tensor, Tensor]
+#     offset_x = rois[:, 0]
+#     offset_y = rois[:, 1]
+#     scale_x = heatmap_size / (rois[:, 2] - rois[:, 0])
+#     scale_y = heatmap_size / (rois[:, 3] - rois[:, 1])
 
-    offset_x = offset_x[:, None]
-    offset_y = offset_y[:, None]
-    scale_x = scale_x[:, None]
-    scale_y = scale_y[:, None]
+#     offset_x = offset_x[:, None]
+#     offset_y = offset_y[:, None]
+#     scale_x = scale_x[:, None]
+#     scale_y = scale_y[:, None]
 
-    x = keypoints[..., 0]
-    y = keypoints[..., 1]
+#     x = keypoints[..., 0]
+#     y = keypoints[..., 1]
 
-    x_boundary_inds = x == rois[:, 2][:, None]
-    y_boundary_inds = y == rois[:, 3][:, None]
+#     x_boundary_inds = x == rois[:, 2][:, None]
+#     y_boundary_inds = y == rois[:, 3][:, None]
 
-    x = (x - offset_x) * scale_x
-    x = x.floor().long()
-    y = (y - offset_y) * scale_y
-    y = y.floor().long()
+#     x = (x - offset_x) * scale_x
+#     x = x.floor().long()
+#     y = (y - offset_y) * scale_y
+#     y = y.floor().long()
 
-    x[x_boundary_inds] = heatmap_size - 1
-    y[y_boundary_inds] = heatmap_size - 1
+#     x[x_boundary_inds] = heatmap_size - 1
+#     y[y_boundary_inds] = heatmap_size - 1
 
-    valid_loc = (x >= 0) & (y >= 0) & (x < heatmap_size) & (y < heatmap_size)
-    vis = keypoints[..., 2] > 0
-    valid = (valid_loc & vis).long()
+#     valid_loc = (x >= 0) & (y >= 0) & (x < heatmap_size) & (y < heatmap_size)
+#     vis = keypoints[..., 2] > 0
+#     valid = (valid_loc & vis).long()
 
-    lin_ind = y * heatmap_size + x
-    heatmaps = lin_ind * valid
+#     lin_ind = y * heatmap_size + x
+#     heatmaps = lin_ind * valid
 
-    return heatmaps, valid
+#     return heatmaps, valid
 
 
 def _onnx_heatmaps_to_keypoints(
