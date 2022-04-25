@@ -96,9 +96,9 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.fasterrcnn_resnet50_fpn_v2
-  class: FasterRCNNResNet50FPNV2
-  FasterRCNNResNet50FPNV2:
+  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  class: MaskRCNNResNet50FPNV2
+  MaskRCNNResNet50FPNV2:
     pretrained: False
     backbone_pretrained: True
     num_classes: 2
@@ -201,7 +201,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
+    dirname: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -218,7 +218,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
+    dirname: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/'''
     save_interval: 1
     n_saved: 1
 

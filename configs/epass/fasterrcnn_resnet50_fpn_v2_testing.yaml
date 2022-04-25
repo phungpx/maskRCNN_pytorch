@@ -1,0 +1,102 @@
+data:
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
+          dirnames:
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/train'''
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/test'''
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/valid'''
+          classes:
+            EPASS_TYPE_1: 1
+            EPASS_TYPE_2: 1
+            EPASS_TYPE_3: 1
+            EPASS_TYPE_4: 1
+            EPASS_TYPE_5: 1
+          image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
+          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
+          label_patterns: ['''*.json''']
+      batch_size: 16
+      shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
+      collate_fn: 'lambda batch:tuple(zip(*batch))'
+
+model:
+  module: flame.core.model.fasterrcnn_resnet50_fpn_v2
+  class: FasterRCNNResNet50FPNV2
+  FasterRCNNResNet50FPNV2:
+    pretrained: False
+    backbone_pretrained: False
+    num_classes: 2
+    # Anchors parameters
+    anchor_sizes: "((32,), (64,), (128,), (256,), (512,))"
+    aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
+    # Box parameters
+    box_score_thresh: 0.5
+    box_nms_thresh: 0.5
+
+metrics:
+  module: flame.handlers.metrics.metrics
+  class: Metrics
+  Metrics:
+    metrics:
+      mAP:
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                EPASS: 1
+              iou_threshold: 0.5
+              verbose: True
+              method: '''every_point_interpolation'''
+          output_transform: 'lambda x: (x[0], x[1])'
+    attach_to:
+      engine: '''test'''
+
+screenlogger:
+  module: flame.handlers.screenlogger
+  class: ScreenLogger
+  ScreenLogger:
+    eval_names:
+      - '''test'''
+
+checkpoint_loader:
+  module: flame.handlers.checkpoint
+  class: CheckpointLoader
+  CheckpointLoader:
+    checkpoint_path: '''checkpoint/EPASS/ResNet50FPN_V2/2204251551/best_model_4_mAP=1.0000.pt'''
+    mode: '''test'''
+
+predictor:
+  module: flame.handlers.predictor
+  class: Predictor
+  Predictor:
+    evaluator_name: '''engine'''
+    output_dir: '''checkpoint/EPASS/ResNet50FPN_V2/2204251551/best_model_4_mAP=1.0000/'''
+    classes:
+      EPASS: [[0, 255, 0], 1]
+    image_size: (800, 800)
+    use_pad_to_square: True
+    output_transform: 'lambda x: (x[0], x[-1])'
+
+engine:
+  module: flame.core.engine.engine
+  class: Evaluator
+  Evaluator:
+    dataset: config['data']['test']
+    device: '''cuda'''
+
+extralibs:
+  torch: torch

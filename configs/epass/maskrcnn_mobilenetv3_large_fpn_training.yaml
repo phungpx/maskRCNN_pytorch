@@ -15,7 +15,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+          image_size: (640, 640)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -55,7 +55,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+          image_size: (640, 640)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -83,7 +83,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+          image_size: (640, 640)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -96,17 +96,17 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.fasterrcnn_resnet50_fpn_v2
-  class: FasterRCNNResNet50FPNV2
-  FasterRCNNResNet50FPNV2:
-    pretrained: False
-    backbone_pretrained: True
+  module: flame.core.model.maskrcnn_mobilenetv3_large_fpn
+  class: MaskRCNNMobileNetV3LargeFPN
+  MaskRCNNMobileNetV3LargeFPN:
+    # pretrained: False
+    backbone_pretrained: False
     num_classes: 2
     # Anchors parameters
-    anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
-    aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
+    anchor_sizes: '((32, 64, 128, 256, 512,),) * 3'
+    aspect_ratios: '((0.25, 0.5, 1.0, 2.0, 4.0),) * 3'
     # Box parameters
-    box_score_thresh: 0.5
+    box_score_thresh: 0.2
     box_nms_thresh: 0.2
 
 optim:
@@ -201,7 +201,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
+    dirname: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -218,7 +218,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EPASS/ResNet50FPN_V2/'''
+    dirname: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
     save_interval: 1
     n_saved: 1
 

@@ -2,19 +2,16 @@ from collections import OrderedDict
 from typing import Any, Callable, Optional
 
 from torch import nn, Tensor
-from torchvision.ops import MultiScaleRoIAlign
-from torchvision.transforms import InterpolationMode
 
-from .functions import misc as misc_nn_ops
-from .functions.utils import overwrite_eps
-from .functions._meta import _COCO_CATEGORIES
-from .functions._api import WeightsEnum, Weights
-from .functions._utils import handle_legacy_interface, _ovewrite_value_param
+from .utils._meta import _COCO_CATEGORIES
+from .utils._api import WeightsEnum, Weights
+from .utils._utils import InterpolationMode, overwrite_eps, handle_legacy_interface, _ovewrite_value_param
+from .utils.block_utils import Conv2dNormActivation, FrozenBatchNorm2d
 
 from .backbones.resnet import ResNet50_Weights, resnet50
-from .backbones.backbone_utils import _resnet_fpn_extractor, _validate_trainable_layers
-
-from .faster_rcnn import FasterRCNN, FastRCNNConvFCHead, RPNHead, _default_anchorgen
+from .backbones.backbone import _resnet_fpn_extractor, _validate_trainable_layers
+from .roi_align.poolers import MultiScaleRoIAlign
+from .faster_rcnn import FasterRCNN, RPNHead, FastRCNNConvFCHead, _default_anchorgen
 
 
 __all__ = [
@@ -281,7 +278,7 @@ class MaskRCNNHeads(nn.Sequential):
         next_feature = in_channels
         for layer_features in layers:
             blocks.append(
-                misc_nn_ops.Conv2dNormActivation(
+                Conv2dNormActivation(
                     next_feature,
                     layer_features,
                     kernel_size=3,
@@ -457,7 +454,7 @@ def maskrcnn_resnet50_fpn(
 
     is_trained = weights is not None or weights_backbone is not None
     trainable_backbone_layers = _validate_trainable_layers(is_trained, trainable_backbone_layers, 5, 3)
-    norm_layer = misc_nn_ops.FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
+    norm_layer = FrozenBatchNorm2d if is_trained else nn.BatchNorm2d
 
     backbone = resnet50(weights=weights_backbone, progress=progress, norm_layer=norm_layer)
     backbone = _resnet_fpn_extractor(backbone, trainable_backbone_layers)
