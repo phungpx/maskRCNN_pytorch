@@ -40,20 +40,33 @@ class Trainer(Engine):
     def init(self):
         assert 'model' in self.frame, 'The frame does not have model.'
         assert 'optim' in self.frame, 'The frame does not have optim.'
+        assert 'loss' in self.frame, 'The frame does not have loss.'
         self.model = self.frame['model'].to(self.device)
         self.optimizer = self.frame['optim']
+        self.loss = self.frame['loss']
+        self.scaler = self.frame.get('scaler', None)
         print(f'[Info] parameters of model: {sum(param.numel() for param in self.model.parameters() if param.requires_grad)} params.')
 
     def _update(self, engine, batch):
         self.model.train()
         self.optimizer.zero_grad()
+
         params = [param.to(self.device) if torch.is_tensor(param) else param for param in batch]
         samples = list(sample.to(self.device) for sample in params[0])
         targets = [{k: v.to(self.device) for k, v in sample.items()} for sample in params[1]]
-        losses = self.model(samples, targets)
-        loss = sum(loss for loss in losses.values())
-        loss.backward()
-        self.optimizer.step()
+
+        with torch.cuda.amp.autocast(enabled=self.scaler is not None):
+            losses = self.model(samples, targets)
+            loss = self.loss(losses)  # loss = sum(loss for loss in losses.values())
+
+        if self.scaler is not None:
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+        else:
+            loss.backward()
+            self.optimizer.step()
+
         return loss.item()
 
 

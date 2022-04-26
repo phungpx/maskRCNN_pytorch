@@ -168,6 +168,7 @@ class FasterRCNN(GeneralizedRCNN):
     def __init__(
         self,
         backbone,
+        # is_training=False,  # add for getting losses in evaluation mode
         num_classes=None,
         # transform parameters
         min_size=800,
@@ -236,15 +237,16 @@ class FasterRCNN(GeneralizedRCNN):
         rpn_post_nms_top_n = dict(training=rpn_post_nms_top_n_train, testing=rpn_post_nms_top_n_test)
 
         rpn = RegionProposalNetwork(
-            rpn_anchor_generator,
-            rpn_head,
-            rpn_fg_iou_thresh,
-            rpn_bg_iou_thresh,
-            rpn_batch_size_per_image,
-            rpn_positive_fraction,
-            rpn_pre_nms_top_n,
-            rpn_post_nms_top_n,
-            rpn_nms_thresh,
+            # is_training=is_training,  # add for getting rpn losses in evaluation mode
+            anchor_generator=rpn_anchor_generator,
+            head=rpn_head,
+            fg_iou_thresh=rpn_fg_iou_thresh,
+            bg_iou_thresh=rpn_bg_iou_thresh,
+            batch_size_per_image=rpn_batch_size_per_image,
+            positive_fraction=rpn_positive_fraction,
+            pre_nms_top_n=rpn_pre_nms_top_n,
+            post_nms_top_n=rpn_post_nms_top_n,
+            nms_thresh=rpn_nms_thresh,
             score_thresh=rpn_score_thresh,
         )
 
@@ -266,17 +268,18 @@ class FasterRCNN(GeneralizedRCNN):
 
         roi_heads = RoIHeads(
             # Box
-            box_roi_pool,
-            box_head,
-            box_predictor,
-            box_fg_iou_thresh,
-            box_bg_iou_thresh,
-            box_batch_size_per_image,
-            box_positive_fraction,
-            bbox_reg_weights,
-            box_score_thresh,
-            box_nms_thresh,
-            box_detections_per_img,
+            # is_training=is_training,  # add for getting box losses in evaluation mode
+            box_roi_pool=box_roi_pool,
+            box_head=box_head,
+            box_predictor=box_predictor,
+            fg_iou_thresh=box_fg_iou_thresh,
+            bg_iou_thresh=box_bg_iou_thresh,
+            batch_size_per_image=box_batch_size_per_image,
+            positive_fraction=box_positive_fraction,
+            bbox_reg_weights=bbox_reg_weights,
+            score_thresh=box_score_thresh,
+            nms_thresh=box_nms_thresh,
+            detections_per_img=box_detections_per_img,
         )
 
         if image_mean is None:

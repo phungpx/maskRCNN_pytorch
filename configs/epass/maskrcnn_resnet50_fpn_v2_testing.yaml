@@ -17,6 +17,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
+            V_SERIAL: 2
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
@@ -35,7 +36,7 @@ model:
   MaskRCNNResNet50FPNV2:
     pretrained: False
     backbone_pretrained: True
-    num_classes: 2
+    num_classes: 3
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
     aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
@@ -58,6 +59,7 @@ metrics:
             MeanAveragePrecision:
               classes:
                 EPASS: 1
+                V_SERIAL: 2
               iou_threshold: 0.5
               verbose: True
               method: '''every_point_interpolation'''
@@ -76,7 +78,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204251726/best_model_52_mAP=0.9941.pt'''
+    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931.pt'''
     mode: '''test'''
 
 predictor:
@@ -84,10 +86,13 @@ predictor:
   class: Predictor
   Predictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204251726/best_model_52_mAP=0.9941/'''
+    output_dir: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931/'''
     classes:
       EPASS: [[0, 255, 0], 1]
+      V_SERIAL: [[255, 0, 0], 2]
     alpha: 0.3
+    draw_class: False
+    draw_box: True
     image_size: (800, 800)
     use_pad_to_square: True
     output_transform: 'lambda x: (x[0], x[-1])'

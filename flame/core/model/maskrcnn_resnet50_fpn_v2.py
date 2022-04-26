@@ -1,11 +1,7 @@
 from torch import nn
-from .maskRCNN.rpn.rpn import RPNHead
-from .maskRCNN.anchor import AnchorGenerator
-from .maskRCNN.utils._utils import _ovewrite_value_param
-from .maskRCNN.backbones.backbone import _resnet_fpn_extractor, _validate_trainable_layers
-from .maskRCNN.backbones.resnet import ResNet50_Weights, resnet50
-from .maskRCNN.faster_rcnn import FastRCNNConvFCHead
-from .maskRCNN.mask_rcnn import MaskRCNN, MaskRCNNHeads, MaskRCNN_ResNet50_FPN_V2_Weights
+from .maskRCNN.faster_rcnn import ResNet50_Weights, resnet50, AnchorGenerator, FastRCNNConvFCHead
+from .maskRCNN.mask_rcnn import MaskRCNN, RPNHead, MaskRCNNHeads, MaskRCNN_ResNet50_FPN_V2_Weights
+from .maskRCNN.faster_rcnn import _resnet_fpn_extractor, _validate_trainable_layers, _ovewrite_value_param
 
 from typing import Optional, List, Tuple, Any
 

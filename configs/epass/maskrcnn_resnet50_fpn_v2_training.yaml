@@ -101,6 +101,18 @@ data:
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
+loss:
+  module: flame.core.loss.aggregated_loss
+  class: AggregatedLoss
+  AggregatedLoss:
+    verbose: False
+    box_cls_weight: 1.
+    box_reg_weight: 1.
+    rpn_cls_weight: 1.
+    rpn_reg_weight: 1.
+    mask_weight: 1.
+    output_transform: 'lambda x: x'
+
 model:
   module: flame.core.model.maskrcnn_resnet50_fpn_v2
   class: MaskRCNNResNet50FPNV2
@@ -114,6 +126,11 @@ model:
     # Box parameters
     box_score_thresh: 0.5
     box_nms_thresh: 0.2
+
+# FP16: https://pytorch.org/docs/stable/amp.html
+scaler:
+  module: torch.cuda.amp
+  class: GradScaler
 
 optim:
   module: torch.optim

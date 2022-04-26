@@ -13,9 +13,11 @@ class Predictor(Module):
     def __init__(
         self,
         alpha: float = 0.3,
-        draw_box: bool = True,
         image_size: Optional[Tuple[int, int]] = None,  # w, h
         evaluator_name: str = None,
+        draw_box: bool = False,
+        draw_mask: bool = False,
+        draw_class: bool = False,
         classes: Dict[str, List] = None,
         use_pad_to_square: bool = False,
         output_dir: str = None,
@@ -26,6 +28,8 @@ class Predictor(Module):
         self.alpha = alpha
         self.classes = classes
         self.draw_box = draw_box
+        self.draw_mask = draw_mask
+        self.draw_class = draw_class
         self.image_size = image_size
         self.evaluator_name = evaluator_name
         self.binary_threshold = binary_threshold
@@ -98,21 +102,22 @@ class Predictor(Module):
                         color=color, thickness=box_thickness
                     )
 
-                    title = f"{class_name}: {score:.4f}"
-                    w_text, h_text = cv2.getTextSize(
-                        title, cv2.FONT_HERSHEY_PLAIN, font_scale, text_thickness
-                    )[0]
+                    if self.draw_class:
+                        title = f"{class_name}: {score:.4f}"
+                        w_text, h_text = cv2.getTextSize(
+                            title, cv2.FONT_HERSHEY_PLAIN, font_scale, text_thickness
+                        )[0]
 
-                    cv2.rectangle(
-                        img=image, pt1=(x1, y1 + int(1.6 * h_text)), pt2=(x1 + w_text, y1),
-                        color=color, thickness=-1
-                    )
+                        cv2.rectangle(
+                            img=image, pt1=(x1, y1 + int(1.6 * h_text)), pt2=(x1 + w_text, y1),
+                            color=color, thickness=-1
+                        )
 
-                    cv2.putText(
-                        img=image, text=title, org=(x1, y1 + int(1.3 * h_text)),
-                        fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale,
-                        color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
-                    )
+                        cv2.putText(
+                            img=image, text=title, org=(x1, y1 + int(1.3 * h_text)),
+                            fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale,
+                            color=(255, 255, 255), thickness=text_thickness, lineType=cv2.LINE_AA
+                        )
 
                 if masks is not None:
                     mask = masks[i]
@@ -130,7 +135,7 @@ class Predictor(Module):
                     # draw boundary of mask
                     contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
                     cv2.drawContours(
-                        image=image, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=box_thickness
+                        image=image, contours=contours, contourIdx=-1, color=(255, 255, 255), thickness=box_thickness
                     )
 
             cv2.imwrite(save_path, image)
