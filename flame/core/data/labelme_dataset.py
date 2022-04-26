@@ -17,7 +17,7 @@ class LabelmeDataset(Dataset):
     def __init__(
         self,
         dirnames: List[str] = None,
-        image_size: Optional[Tuple[int, int]] = (800, 800),
+        image_size: Optional[Tuple[int, int]] = None,
         image_patterns: List[str] = ['*.jpg'],
         label_patterns: List[str] = ['*.xml'],
         classes: Dict[str, int] = None,
@@ -45,8 +45,8 @@ class LabelmeDataset(Dataset):
 
         self.data_pairs = [[image, label] for image, label in zip(image_paths, label_paths) if image.stem == label.stem]
 
-        self.pad_to_square = iaa.PadToSquare(position='right-bottom', pad_cval=0)
         if image_size is not None:
+            self.pad_to_square = iaa.PadToSquare(position='right-bottom', pad_cval=0)
             self.image_resizer = iaa.Resize(size=image_size, interpolation='cubic')
             self.mask_resizer = iaa.Resize(size=image_size, interpolation='nearest')
 

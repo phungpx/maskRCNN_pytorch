@@ -15,7 +15,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -55,7 +55,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -83,7 +83,7 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']

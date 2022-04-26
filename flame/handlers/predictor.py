@@ -14,7 +14,7 @@ class Predictor(Module):
         self,
         alpha: float = 0.3,
         draw_box: bool = True,
-        image_size: Optional[Tuple[int, int]] = (800, 800),  # w, h
+        image_size: Optional[Tuple[int, int]] = None,  # w, h
         evaluator_name: str = None,
         classes: Dict[str, List] = None,
         use_pad_to_square: bool = False,

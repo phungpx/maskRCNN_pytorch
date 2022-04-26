@@ -8,14 +8,16 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/train'''
             - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/test'''
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/valid'''
           classes:
             EPASS_TYPE_1: 1
             EPASS_TYPE_2: 1
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (640, 640)
+          # image_size: (640, 640)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -74,7 +76,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
+    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/2204251754/best_model_55_mAP=0.8121.pt'''
     mode: '''test'''
 
 predictor:
@@ -82,11 +84,11 @@ predictor:
   class: Predictor
   Predictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
+    output_dir: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/2204251754/best_model_55_mAP=0.8121/'''
     classes:
       EPASS: [[0, 255, 0], 1]
     alpha: 0.3
-    image_size: (640, 640)
+    # image_size: (640, 640)
     use_pad_to_square: True
     output_transform: 'lambda x: (x[0], x[-1])'
 

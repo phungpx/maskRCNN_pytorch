@@ -8,11 +8,11 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
+            - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
+            - '''dataset/SCENE_TEXT/icdar_2011/train'''
+            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
             - '''dataset/SCENE_TEXT/totaltext/train'''
-            # - '''dataset/SCENE_TEXT/TD500/train'''
+            - '''dataset/SCENE_TEXT/TD500/train'''
           classes:
             word: 1
           image_size: None
@@ -27,7 +27,7 @@ data:
             # - iaa.Grayscale(alpha=(0.0, 1.0))
             # - iaa.Add(value=(-50, 50), per_channel=True)
             - iaa.Fliplr(p=0.5)
-            # - iaa.Flipud(p=0.5)
+            - iaa.Flipud(p=0.5)
             # - iaa.Crop(percent=(0, 0.1))
             # - iaa.Pad(percent=(0, 0.1), keep_size=False)
             # - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
@@ -48,11 +48,11 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            # - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
+            - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
+            - '''dataset/SCENE_TEXT/icdar_2011/train'''
+            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
             - '''dataset/SCENE_TEXT/totaltext/train'''
-            # - '''dataset/SCENE_TEXT/TD500/train'''
+            - '''dataset/SCENE_TEXT/TD500/train'''
           classes:
             word: 1
           image_size: None
@@ -76,10 +76,10 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
+            - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
+            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
             - '''dataset/SCENE_TEXT/totaltext/valid'''
-            # - '''dataset/SCENE_TEXT/TD500/test'''
+            - '''dataset/SCENE_TEXT/TD500/test'''
           classes:
             word: 1
           image_size: None
@@ -95,14 +95,18 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.maskrcnn
-  class: MaskrcnnResnet50FPN
-  MaskrcnnResnet50FPN:
+  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  class: MaskRCNNResNet50FPNV2
+  MaskRCNNResNet50FPNV2:
+    pretrained: False
+    backbone_pretrained: True
     num_classes: 2
-    pretrained: True
-    pretrained_backbone: True
-    score_threshold: 0.2
-    nms_threshold: 0.2
+    # Anchors parameters
+    anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
+    aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
+    # Box parameters
+    box_score_thresh: 0.5
+    box_nms_thresh: 0.2
 
 optim:
   module: torch.optim
@@ -196,7 +200,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/'''
+    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -213,7 +217,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn/totaltext/'''
+    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'''
     save_interval: 1
     n_saved: 1
 

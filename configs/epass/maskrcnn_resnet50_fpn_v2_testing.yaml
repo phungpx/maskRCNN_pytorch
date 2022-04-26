@@ -8,7 +8,9 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/train'''
             - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/test'''
+            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/valid'''
           classes:
             EPASS_TYPE_1: 1
             EPASS_TYPE_2: 1
@@ -74,7 +76,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EPASS/checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/'''
+    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204251726/best_model_52_mAP=0.9941.pt'''
     mode: '''test'''
 
 predictor:
@@ -82,7 +84,7 @@ predictor:
   class: Predictor
   Predictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EPASS/checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/'''
+    output_dir: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204251726/best_model_52_mAP=0.9941/'''
     classes:
       EPASS: [[0, 255, 0], 1]
     alpha: 0.3

@@ -22,7 +22,7 @@ class PascalDataset(Dataset):
         classes: Dict[str, int] = None,
         mean: List[float] = [0.485, 0.456, 0.406],
         std: List[float] = [0.229, 0.224, 0.225],
-        image_size: Optional[Tuple[int, int]] = (800, 800),
+        image_size: Optional[Tuple[int, int]] = None,
         transforms: Optional[List] = None
     ):
         super(PascalDataset, self).__init__()
@@ -30,7 +30,6 @@ class PascalDataset(Dataset):
         self.image_size = image_size
         self.std = torch.tensor(std, dtype=torch.float).view(3, 1, 1)
         self.mean = torch.tensor(mean, dtype=torch.float).view(3, 1, 1)
-        self.pad_to_square = iaa.PadToSquare(position='right-bottom')
         self.transforms = transforms if transforms else []
 
         # VOC2007
@@ -52,6 +51,9 @@ class PascalDataset(Dataset):
                 voc2012_pairs.append([image_path, label_path])
 
         self.data_pairs = voc2007_pairs + voc2012_pairs
+
+        if self.image_size is not None:
+            self.pad_to_square = iaa.PadToSquare(position='right-bottom')
 
         print(f'- {txt_path.stem}:')
         print(f'\t VOC2007: {len(voc2007_pairs)}')
@@ -110,8 +112,10 @@ class PascalDataset(Dataset):
             image, bboxes = transform(image=image, bounding_boxes=bboxes)
 
         # Pad to square to keep object's ratio, then Rescale image and bounding boxes
-        # image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
-        # image, bboxes = iaa.Resize(size=self.imsize)(image=image, bounding_boxes=bboxes)
+        if self.image_size is not None:
+            image, bboxes = self.pad_to_square(image=image, bounding_boxes=bboxes)
+            image, bboxes = iaa.Resize(size=self.imsize)(image=image, bounding_boxes=bboxes)
+
         bboxes = bboxes.on(image)
 
         # Convert from Bouding Box Object to boxes, labels list

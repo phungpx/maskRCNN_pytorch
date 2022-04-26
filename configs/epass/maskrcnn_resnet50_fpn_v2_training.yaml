@@ -15,7 +15,9 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+            V_SERIAL: 2
+          # image_size: (800, 800)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -55,7 +57,9 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+            V_SERIAL: 2
+          # image_size: (800, 800)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -83,7 +87,9 @@ data:
             EPASS_TYPE_3: 1
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
-          image_size: (800, 800)
+            V_SERIAL: 2
+          # image_size: (800, 800)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -101,7 +107,7 @@ model:
   MaskRCNNResNet50FPNV2:
     pretrained: False
     backbone_pretrained: True
-    num_classes: 2
+    num_classes: 3
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
     aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
@@ -147,6 +153,7 @@ metrics:
             MeanAveragePrecision:
               classes:
                 EPASS: 1
+                V_SERIAL: 2
               iou_threshold: 0.5
               verbose: False
               method: '''every_point_interpolation'''
@@ -185,7 +192,7 @@ lr_scheduler:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 5
+    patience: 10
     verbose: True
 
 early_stopping:
@@ -195,7 +202,7 @@ early_stopping:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 50
+    patience: 20
 
 best_saver:
   module: flame.handlers.checkpoint

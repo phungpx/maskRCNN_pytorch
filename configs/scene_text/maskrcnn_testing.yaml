@@ -8,8 +8,8 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            # - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
-            # - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
+            - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
+            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
             - '''dataset/SCENE_TEXT/totaltext/valid'''
           classes:
             word: 1
@@ -26,14 +26,18 @@ data:
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
 model:
-  module: flame.core.model.maskrcnn
-  class: MaskrcnnResnet50FPN
-  MaskrcnnResnet50FPN:
-    num_classes: 2
+  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  class: MaskRCNNResNet50FPNV2
+  MaskRCNNResNet50FPNV2:
     pretrained: False
-    pretrained_backbone: False
-    score_threshold: 0.5
-    nms_threshold: 0.2
+    backbone_pretrained: True
+    num_classes: 2
+    # Anchors parameters
+    anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
+    aspect_ratios: "((0.25, 0.5, 1.0, 2.0, 4.0),) * 5"
+    # Box parameters
+    box_score_thresh: 0.5
+    box_nms_thresh: 0.2
 
 metrics:
   module: flame.handlers.metrics.metrics
