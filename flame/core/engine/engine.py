@@ -45,6 +45,8 @@ class Trainer(Engine):
         self.optimizer = self.frame['optim']
         self.loss = self.frame['loss']
         self.scaler = self.frame.get('scaler', None)
+        if self.scaler is not None:
+            print('[Info] using FP16 mode.')
         print(f'[Info] parameters of model: {sum(param.numel() for param in self.model.parameters() if param.requires_grad)} params.')
 
     def _update(self, engine, batch):

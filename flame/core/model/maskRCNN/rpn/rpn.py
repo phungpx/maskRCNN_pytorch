@@ -220,7 +220,9 @@ class RegionProposalNetwork(torch.nn.Module):
                 labels_per_image[inds_to_discard] = -1.0
 
             labels.append(labels_per_image)
+
             matched_gt_boxes.append(matched_gt_boxes_per_image)
+
         return labels, matched_gt_boxes
 
     def _get_top_n_idx(self, objectness: Tensor, num_anchors_per_level: List[int]) -> Tensor:

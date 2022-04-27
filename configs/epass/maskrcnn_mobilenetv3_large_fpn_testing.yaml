@@ -18,6 +18,7 @@ data:
             EPASS_TYPE_4: 1
             EPASS_TYPE_5: 1
           # image_size: (640, 640)
+          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
@@ -37,7 +38,7 @@ model:
     backbone_pretrained: False
     num_classes: 2
     # Anchors parameters
-    anchor_sizes: '((32, 64, 128, 256, 512,),) * 3'
+    anchor_sizes: '((16, 32, 64, 128, 256,),) * 3'
     aspect_ratios: '((0.25, 0.5, 1.0, 2.0, 4.0),) * 3'
     # Box parameters
     box_score_thresh: 0.2

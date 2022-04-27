@@ -95,6 +95,18 @@ data:
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
+loss:
+  module: flame.core.loss.aggregated_loss
+  class: AggregatedLoss
+  AggregatedLoss:
+    verbose: False
+    box_cls_weight: 1.
+    box_reg_weight: 1.
+    rpn_cls_weight: 1.
+    rpn_reg_weight: 1.
+    mask_weight: 1.
+    output_transform: 'lambda x: x'
+
 model:
   module: flame.core.model.maskrcnn_mobilenetv3_large_fpn
   class: MaskRCNNMobileNetV3LargeFPN
@@ -103,11 +115,16 @@ model:
     backbone_pretrained: False
     num_classes: 2
     # Anchors parameters
-    anchor_sizes: '((32, 64, 128, 256, 512,),) * 3'
+    anchor_sizes: '((16, 32, 64, 128, 256,),) * 3'
     aspect_ratios: '((0.25, 0.5, 1.0, 2.0, 4.0),) * 3'
     # Box parameters
     box_score_thresh: 0.2
     box_nms_thresh: 0.2
+
+# FP16: https://pytorch.org/docs/stable/amp.html
+scaler:
+  module: torch.cuda.amp
+  class: GradScaler
 
 optim:
   module: torch.optim
@@ -201,7 +218,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
+    dirname: '''checkpoint/EPASS/maskrcnn_mobilenetv3_large_fpn/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -218,7 +235,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EPASS/MaskRCNN_MobileNetV3_Large_FPN/'''
+    dirname: '''checkpoint/EPASS/maskrcnn_mobilenetv3_large_fpn/'''
     save_interval: 1
     n_saved: 1
 
