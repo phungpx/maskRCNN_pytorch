@@ -13,7 +13,6 @@ data:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: (800, 800)
-          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
@@ -51,7 +50,6 @@ data:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: (800, 800)
-          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
@@ -77,7 +75,6 @@ data:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: (800, 800)
-          image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
@@ -149,20 +146,21 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.mean_average_precision.evaluator
+        module: flame.handlers.metrics.evaluator
         class: Evaluator
         Evaluator:
           eval_fn:
-            module: flame.handlers.metrics.mean_average_precision.mAP
+            module: flame.core.metric.mAP
             class: MeanAveragePrecision
             MeanAveragePrecision:
               classes:
                 CARD_BACK_TYPE_1: 1
                 CARD_FRONT_TYPE_1: 2
               iou_threshold: 0.5
-              verbose: False
               method: '''every_point_interpolation'''
-          output_transform: 'lambda x: (x[0], x[1])'
+              print_detail_mAP: False
+              print_FP_files: False
+          output_transform: 'lambda x: (x[0], x[1], x[2])'
     attach_to:
       train_evaluator: '''train'''
       valid_evaluator: '''valid'''
