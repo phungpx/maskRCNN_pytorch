@@ -11,13 +11,13 @@ data:
             - '''dataset/NATCOM2/train'''
           classes:
             CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 2
-            CARD_BACK_TYPE_2: 3
-            CARD_FRONT_TYPE_2: 4
-            CARD_BACK_TYPE_3: 5
-            CARD_FRONT_TYPE_3: 6
-            PASSPORT: 7
-            BLX: 8
+            CARD_FRONT_TYPE_1: 1
+            CARD_BACK_TYPE_2: 1
+            CARD_FRONT_TYPE_2: 1
+            CARD_BACK_TYPE_3: 1
+            CARD_FRONT_TYPE_3: 1
+            PASSPORT: 1
+            BLX: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
@@ -54,13 +54,13 @@ data:
             - '''dataset/NATCOM2/train'''
           classes:
             CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 2
-            CARD_BACK_TYPE_2: 3
-            CARD_FRONT_TYPE_2: 4
-            CARD_BACK_TYPE_3: 5
-            CARD_FRONT_TYPE_3: 6
-            PASSPORT: 7
-            BLX: 8
+            CARD_FRONT_TYPE_1: 1
+            CARD_BACK_TYPE_2: 1
+            CARD_FRONT_TYPE_2: 1
+            CARD_BACK_TYPE_3: 1
+            CARD_FRONT_TYPE_3: 1
+            PASSPORT: 1
+            BLX: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
@@ -85,13 +85,13 @@ data:
             - '''dataset/NATCOM2/valid'''
           classes:
             CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 2
-            CARD_BACK_TYPE_2: 3
-            CARD_FRONT_TYPE_2: 4
-            CARD_BACK_TYPE_3: 5
-            CARD_FRONT_TYPE_3: 6
-            PASSPORT: 7
-            BLX: 8
+            CARD_FRONT_TYPE_1: 1
+            CARD_BACK_TYPE_2: 1
+            CARD_FRONT_TYPE_2: 1
+            CARD_BACK_TYPE_3: 1
+            CARD_FRONT_TYPE_3: 1
+            PASSPORT: 1
+            BLX: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
@@ -122,7 +122,7 @@ model:
   MaskRCNNResNet50FPNV2:
     pretrained: False
     backbone_pretrained: True
-    num_classes: 9
+    num_classes: 2
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
@@ -172,14 +172,7 @@ metrics:
             class: MeanAveragePrecision
             MeanAveragePrecision:
               classes:
-                CARD_BACK_TYPE_1: 1
-                CARD_FRONT_TYPE_1: 2
-                CARD_BACK_TYPE_2: 3
-                CARD_FRONT_TYPE_2: 4
-                CARD_BACK_TYPE_3: 5
-                CARD_FRONT_TYPE_3: 6
-                PASSPORT: 7
-                BLX: 8
+                CARD: 1
               iou_threshold: 0.5
               method: '''every_point_interpolation'''
               print_detail_mAP: False
