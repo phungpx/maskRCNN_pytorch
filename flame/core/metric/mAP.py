@@ -1,10 +1,90 @@
+import torch
+import numpy as np
+
+from torch import nn
+from shapely import geometry
 from collections import Counter
+from ignite.metrics import Metric
 from prettytable import PrettyTable
 from typing import List, Tuple, Dict
 
-import numpy as np
-from torch import nn
-from shapely import geometry
+
+class mAP(Metric):
+    def __init__(
+        self,
+        classes: Dict[str, int],
+        iou_threshold: float = 0.5,
+        method: str = 'every_point_interpolation',  # or '11_point_interpolation'
+        print_detail_mAP: bool = False,
+        print_FP_files: bool = False,
+        output_transform=lambda x: x
+    ):
+        super(mAP, self).__init__(output_transform)
+        self.eval_fn = MeanAveragePrecision(
+            classes, iou_threshold, method, print_detail_mAP, print_FP_files,
+        )
+
+    def _get_bboxes(self, pred: Dict[str, torch.Tensor], target: Dict[str, torch.Tensor], image_path: str) -> Tuple[list, list]:
+        '''
+        Args:
+            pred: {
+                boxes: TensorFloat [N x 4],
+                labels: TensorInt64 [N],
+                scores: TensorFloat [N],
+            }
+            target: {
+                image_id: TensorInt64 [M],
+                boxes: TensorFloat [M x 4],
+                labels: TensorInt64 [M],
+            }
+            image_path: str
+        Output:
+            detections: List[
+                [image_idx, class_prediction, prob_score, [x1, y1, x2, y2], image_path]
+            ]
+
+            ground_truths: List[
+                [image_idx, class_target, 1, [x1, y1, x2, y2], image_path]
+            ]
+        '''
+        detections, ground_truths = [], []
+
+        image_idx = target['image_id'].item()
+        target_boxes = target['boxes'].detach().cpu().numpy().tolist()
+        target_labels = target['labels'].detach().cpu().numpy().tolist()
+
+        pred_boxes = pred['boxes'].detach().cpu().numpy().tolist()
+        pred_labels = pred['labels'].detach().cpu().numpy().tolist()
+        pred_scores = pred['scores'].detach().cpu().numpy().tolist()
+
+        for class_id, bbox in zip(target_labels, target_boxes):
+            # [image_idx, class_target, 1, [x1, y1, x2, y2], image_path]
+            ground_truth = [image_idx, class_id, 1, bbox, image_path]
+            ground_truths.append(ground_truth)
+
+        for class_id, score, bbox in zip(pred_labels, pred_scores, pred_boxes):
+            # [image_idx, class_prediction, prob_score, [x1, y1, x2, y2], image_path]
+            if class_id == -1 and score == 0:
+                continue
+            detection = [image_idx, class_id, score, bbox, image_path]
+            detections.append(detection)
+
+        return detections, ground_truths
+
+    def reset(self):
+        self.detections = []
+        self.ground_truths = []
+
+    def update(self, output):
+        preds, targets, image_infos = output
+        for pred, target, image_info in zip(preds, targets, image_infos):
+            _detections, _ground_truths = self._get_bboxes(pred, target, image_info[0])
+            self.detections.extend(_detections)
+            self.ground_truths.extend(_ground_truths)
+
+    def compute(self):
+        metric = self.eval_fn(self.detections, self.ground_truths)
+        return metric
 
 
 class MeanAveragePrecision(nn.Module):

@@ -116,12 +116,26 @@ loss:
     mask_weight: 1.
     output_transform: 'lambda x: x'
 
+# model:
+#   module: flame.core.model.maskrcnn_resnet50_fpn
+#   class: MaskRCNNResNet50FPNV2
+#   MaskRCNNResNet50FPNV2:
+#     pretrained: False
+#     backbone_pretrained: True
+#     num_classes: 2
+#     # Anchors parameters
+#     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
+#     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
+#     # Box parameters
+#     box_score_thresh: 0.5
+#     box_nms_thresh: 0.2
+
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
-  class: MaskRCNNResNet50FPNV2
-  MaskRCNNResNet50FPNV2:
-    pretrained: False
-    backbone_pretrained: True
+  module: flame.core.model.maskrcnn_resnet50_fpn
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
+    pretrained: True
+    pretrained_backbone: False
     num_classes: 2
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
@@ -159,24 +173,20 @@ valid_evaluator:
     device: '''cuda'''
 
 metrics:
-  module: flame.handlers.metrics.metrics
+  module: flame.handlers.metric_evaluator
   class: Metrics
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.evaluator
-        class: Evaluator
-        Evaluator:
-          eval_fn:
-            module: flame.core.metric.mAP
-            class: MeanAveragePrecision
-            MeanAveragePrecision:
-              classes:
-                CARD: 1
-              iou_threshold: 0.5
-              method: '''every_point_interpolation'''
-              print_detail_mAP: False
-              print_FP_files: False
+        module: flame.core.metric.mAP
+        class: mAP
+        mAP:
+          classes:
+            CARD: 1
+          iou_threshold: 0.5
+          method: '''every_point_interpolation'''
+          print_detail_mAP: False
+          print_FP_files: False
           output_transform: 'lambda x: (x[0], x[1], x[2])'
     attach_to:
       train_evaluator: '''train'''
@@ -228,7 +238,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/'''
+    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -245,7 +255,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/'''
+    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN/'''
     save_interval: 1
     n_saved: 1
 

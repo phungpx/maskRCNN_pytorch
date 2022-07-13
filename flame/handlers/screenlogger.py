@@ -10,6 +10,7 @@ class ScreenLogger(Module):
         self.eval_names = eval_names if eval_names else []
 
     def _started(self, engine):
+        print(f"Model Params: {sum(param.numel() for param in self.frame['model'].parameters() if param.requires_grad)} params.")
         print(f'{time.asctime()} - STARTED')
 
     def _completed(self, engine):

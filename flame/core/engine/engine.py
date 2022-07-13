@@ -47,7 +47,6 @@ class Trainer(Engine):
         self.scaler = self.frame.get('scaler', None)
         if self.scaler is not None:
             print('[Info] using FP16 mode.')
-        print(f'[Info] parameters of model: {sum(param.numel() for param in self.model.parameters() if param.requires_grad)} params.')
 
     def _update(self, engine, batch):
         self.model.train()
@@ -81,7 +80,6 @@ class Evaluator(Engine):
     def init(self):
         assert 'model' in self.frame, 'The frame does not have model.'
         self.model = self.frame['model'].to(self.device)
-        print(f'[Info] parameters of model: {sum(param.numel() for param in self.model.parameters() if param.requires_grad)} params.')
 
     def _update(self, engine, batch):
         self.model.eval()

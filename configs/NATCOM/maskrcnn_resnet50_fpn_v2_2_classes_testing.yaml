@@ -32,12 +32,26 @@ data:
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
+# model:
+#   module: flame.core.model.maskrcnn_resnet50_fpn_v2
+#   class: MaskRCNNResNet50FPNV2
+#   MaskRCNNResNet50FPNV2:
+#     pretrained: False
+#     backbone_pretrained: False
+#     num_classes: 2
+#     # Anchors parameters
+#     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
+#     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
+#     # Box parameters
+#     box_score_thresh: 0.5
+#     box_nms_thresh: 0.2
+
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
-  class: MaskRCNNResNet50FPNV2
-  MaskRCNNResNet50FPNV2:
-    pretrained: False
-    backbone_pretrained: False
+  module: flame.core.model.maskrcnn_resnet50_fpn
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
+    pretrained: True
+    pretrained_backbone: False
     num_classes: 2
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
@@ -47,7 +61,7 @@ model:
     box_nms_thresh: 0.2
 
 metrics:
-  module: flame.handlers.metrics.metrics
+  module: flame.handlers.metric_evaluator
   class: Metrics
   Metrics:
     metrics:
