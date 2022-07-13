@@ -1,0 +1,104 @@
+data:
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
+          dirnames:
+            - '''dataset/CAR_INSPECTION/test'''
+          classes:
+            DKIX_COVER_1: 1
+            DKIX_COVER_2: 2
+            DKIX_CONTENT_1: 3
+            DKIX_CONTENT_2: 4
+          image_size: (800, 800)
+          mean: [0., 0., 0.]
+          std: [1., 1., 1.]
+          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
+          label_patterns: ['''*.json''']
+      batch_size: 4
+      shuffle: False
+      num_workers: 12
+      pin_memory: True
+      drop_last: False
+      collate_fn: 'lambda batch:tuple(zip(*batch))'
+
+model:
+  module: flame.core.model.maskrcnn
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
+    num_classes: 5
+    pretrained: False
+    pretrained_backbone: False
+    score_threshold: 0.5
+    nms_threshold: 0.5
+
+metrics:
+  module: flame.handlers.metrics.metrics
+  class: Metrics
+  Metrics:
+    metrics:
+      mAP:
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                DKIX_COVER_1: 1
+                DKIX_COVER_2: 2
+                DKIX_CONTENT_1: 3
+                DKIX_CONTENT_2: 4
+              iou_threshold: 0.5
+              verbose: True
+              method: '''every_point_interpolation'''
+          output_transform: 'lambda x: (x[0], x[1])'
+    attach_to:
+      engine: '''test'''
+
+screenlogger:
+  module: flame.handlers.screenlogger
+  class: ScreenLogger
+  ScreenLogger:
+    eval_names:
+      - '''test'''
+
+checkpoint_loader:
+  module: flame.handlers.checkpoint
+  class: CheckpointLoader
+  CheckpointLoader:
+    checkpoint_path: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271714/best_model_11_mAP=0.9931.pt'''
+    mode: '''test'''
+
+predictor:
+  module: flame.handlers.mask_predictor
+  class: MaskPredictor
+  MaskPredictor:
+    evaluator_name: '''engine'''
+    output_dir: '''checkpoint/CAR_INSPECTION/maskrcnn_resnet50fpn/2110271714/best_model_11_mAP=0.9931/test'''
+    classes:
+      DKIX_COVER_1: [[0, 255, 0], 1]
+      DKIX_COVER_2: [[255, 255, 0], 2]
+      DKIX_CONTENT_1: [[0, 0, 255], 3]
+      DKIX_CONTENT_2: [[255, 0, 0], 4]
+    alpha: 0.3
+    image_size: (800, 800)
+    # score_threshold: 0.4
+    # iou_threshold: 0.5
+    use_pad_to_square: True
+    output_transform: 'lambda x: (x[0], x[-1])'
+
+engine:
+  module: flame.core.engine.engine
+  class: Evaluator
+  Evaluator:
+    dataset: config['data']['test']
+    device: '''cuda'''
+
+extralibs:
+  torch: torch
