@@ -8,9 +8,9 @@ from typing import Tuple
 class MaskrcnnResnet50FPN(nn.Module):
     def __init__(
         self,
-        num_classes: int,
-        box_score_thresh: float,
-        box_nms_thresh: float,
+        num_classes: int = 81,
+        box_score_thresh: float = 0.2,
+        box_nms_thresh: float = 0.2,
         anchor_sizes: Tuple[Tuple[int]] = ((32,), (64,), (128,), (256,), (512,)),
         aspect_ratios: Tuple[Tuple[float]] = ((0.5, 1.0, 2.0),) * 5,
         pretrained: bool = False,
@@ -21,11 +21,13 @@ class MaskrcnnResnet50FPN(nn.Module):
         # anchor generator
         self.model.rpn.anchor_generator.sizes = anchor_sizes
         self.model.rpn.anchor_generator.aspect_ratios = aspect_ratios
-        # roi_heads
+        # box predictor
         in_features = self.model.roi_heads.box_predictor.cls_score.in_features
         self.model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+        # mask predictor
         in_features_mask = self.model.roi_heads.mask_predictor.conv5_mask.in_channels
         self.model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask, 256, num_classes)
+        # box score and nms threshold
         self.model.roi_heads.nms_thresh = box_nms_thresh
         self.model.roi_heads.score_thresh = box_score_thresh
 

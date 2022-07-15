@@ -36,17 +36,19 @@ class Trainer(Engine):
         Engine controls training process.
         See Engine documentation for more details about parameters.
     '''
-
     def init(self):
         assert 'model' in self.frame, 'The frame does not have model.'
         assert 'optim' in self.frame, 'The frame does not have optim.'
         assert 'loss' in self.frame, 'The frame does not have loss.'
+        assert 'logger' in self.frame, 'The frame does not have logger.'
         self.model = self.frame['model'].to(self.device)
         self.optimizer = self.frame['optim']
         self.loss = self.frame['loss']
+        self.logger = self.frame['logger']
         self.scaler = self.frame.get('scaler', None)
+        self.writer = self.frame.get('writer', None)
         if self.scaler is not None:
-            print('[Info] using FP16 mode.')
+            self.logger.info('using FP16 mode.')
 
     def _update(self, engine, batch):
         self.model.train()
@@ -58,7 +60,7 @@ class Trainer(Engine):
 
         with torch.cuda.amp.autocast(enabled=self.scaler is not None):
             losses = self.model(samples, targets)
-            loss = self.loss(losses)  # loss = sum(loss for loss in losses.values())
+            loss = self.loss(losses)
 
         if self.scaler is not None:
             self.scaler.scale(loss).backward()
@@ -67,6 +69,17 @@ class Trainer(Engine):
         else:
             loss.backward()
             self.optimizer.step()
+
+        if self.writer is not None:
+            step = engine.state.iteration
+            # log learning_rate
+            current_lr = self.optimizer.param_groups[0]['lr']
+            self.writer.add_scalar(tag='learning_rate', scalar_value=current_lr, global_step=step)
+            # log loss
+            self.writer.add_scalar(tag='train_loss', scalar_value=loss.item(), global_step=step)
+            # log all training losses
+            for loss_name, loss_value in losses.items():
+                self.writer.add_scalar(tag=f'train_{loss_name}', scalar_value=loss_value.item(), global_step=step)
 
         return loss.item()
 

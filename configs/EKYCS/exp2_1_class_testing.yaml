@@ -8,18 +8,33 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train'''
-            - '''dataset/NATCOM2/test'''
-            - '''dataset/NATCOM2/valid'''
+            - '''../efficient_det_pytorch/dataset/eEKYC/train'''
+            - '''../efficient_det_pytorch/dataset/eEKYC/test'''
+            - '''../efficient_det_pytorch/dataset/eEKYC/valid'''
           classes:
-            CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 1
-            CARD_BACK_TYPE_2: 1
-            CARD_FRONT_TYPE_2: 1
-            CARD_BACK_TYPE_3: 1
-            CARD_FRONT_TYPE_3: 1
-            PASSPORT: 1
             BLX: 1
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
@@ -32,36 +47,17 @@ data:
       drop_last: False
       collate_fn: 'lambda batch:tuple(zip(*batch))'
 
-# model:
-#   module: flame.core.model.maskrcnn_resnet50_fpn_v2
-#   class: MaskRCNNResNet50FPNV2
-#   MaskRCNNResNet50FPNV2:
-#     pretrained: False
-#     backbone_pretrained: False
-#     num_classes: 2
-#     # Anchors parameters
-#     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
-#     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
-#     # Box parameters
-#     box_score_thresh: 0.5
-#     box_nms_thresh: 0.2
-
 model:
   module: flame.core.model.maskrcnn_resnet50_fpn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
-    pretrained: True
-    pretrained_backbone: False
     num_classes: 2
-    # Anchors parameters
-    anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
-    aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
     # Box parameters
     box_score_thresh: 0.5
     box_nms_thresh: 0.2
 
 metrics:
-  module: flame.handlers.metric_evaluator
+  module: flame.handlers.metrics.metrics
   class: Metrics
   Metrics:
     metrics:
@@ -70,8 +66,8 @@ metrics:
         class: COCOEvaluator
         COCOEvaluator:
           image_size: (800, 800)
-          detection_path: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/2206131712/NATCOM_det_val.json'''
-          ground_truth_path: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/2206131712/NATCOM_gt_val.json'''
+          detection_path: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/2205251005/eEKYC_det_val.json'''
+          ground_truth_path: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/2205251005/eEKYC_gt_val.json'''
           classes:
             CARD: 1
           output_transform: 'lambda x: (x[0], x[1], x[2])'
@@ -89,7 +85,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/2206131712/best_model_10_mAP=0.9979.pt'''
+    checkpoint_path: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/2205251005/'''
     mode: '''test'''
 
 predictor:
@@ -97,7 +93,7 @@ predictor:
   class: Predictor
   Predictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN_V2/2206131712/best_model_10_mAP=0.9979/'''
+    output_dir: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/2205251005/'''
     classes:
       CARD: [[0, 255, 0], 1]
     alpha: 0.3

@@ -8,21 +8,36 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train'''
+            - '''/dataset/eEKYC/train'''
           classes:
-            CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 1
-            CARD_BACK_TYPE_2: 1
-            CARD_FRONT_TYPE_2: 1
-            CARD_BACK_TYPE_3: 1
-            CARD_FRONT_TYPE_3: 1
-            PASSPORT: 1
             BLX: 1
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          label_patterns: ['''*.xml''']
           transforms:
             - iaa.MotionBlur()
             - iaa.ChangeColorTemperature()
@@ -51,21 +66,36 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train'''
+            - '''../efficient_det_pytorch/dataset/eEKYC/train'''
           classes:
-            CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 1
-            CARD_BACK_TYPE_2: 1
-            CARD_FRONT_TYPE_2: 1
-            CARD_BACK_TYPE_3: 1
-            CARD_FRONT_TYPE_3: 1
-            PASSPORT: 1
             BLX: 1
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          label_patterns: ['''*.xml''']
       batch_size: 8
       shuffle: False
       num_workers: 12
@@ -82,21 +112,36 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/valid'''
+            - '''../efficient_det_pytorch/dataset/eEKYC/valid'''
           classes:
-            CARD_BACK_TYPE_1: 1
-            CARD_FRONT_TYPE_1: 1
-            CARD_BACK_TYPE_2: 1
-            CARD_FRONT_TYPE_2: 1
-            CARD_BACK_TYPE_3: 1
-            CARD_FRONT_TYPE_3: 1
-            PASSPORT: 1
             BLX: 1
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
           image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          label_patterns: ['''*.xml''']
       batch_size: 8
       shuffle: False
       num_workers: 12
@@ -116,27 +161,13 @@ loss:
     mask_weight: 1.
     output_transform: 'lambda x: x'
 
-# model:
-#   module: flame.core.model.maskrcnn_resnet50_fpn
-#   class: MaskRCNNResNet50FPNV2
-#   MaskRCNNResNet50FPNV2:
-#     pretrained: False
-#     backbone_pretrained: True
-#     num_classes: 2
-#     # Anchors parameters
-#     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
-#     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
-#     # Box parameters
-#     box_score_thresh: 0.5
-#     box_nms_thresh: 0.2
-
 model:
   module: flame.core.model.maskrcnn_resnet50_fpn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     pretrained: True
     pretrained_backbone: False
-    num_classes: 2
+    num_classes: 24
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
@@ -173,24 +204,63 @@ valid_evaluator:
     device: '''cuda'''
 
 metrics:
-  module: flame.handlers.metric_evaluator
+  module: flame.handlers.metrics.metrics
   class: Metrics
   Metrics:
     metrics:
       mAP:
-        module: flame.core.metric.mAP
-        class: mAP
-        mAP:
-          classes:
-            CARD: 1
-          iou_threshold: 0.5
-          method: '''every_point_interpolation'''
-          print_detail_mAP: False
-          print_FP_files: False
+        module: flame.handlers.metrics.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.core.metric.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                BLX: 1
+                BLX_BACK: 1
+                BLX_OLD: 1
+                BLX_BACK_OLD: 1
+                CMND: 1
+                CMND_BACK: 1
+                CCCD: 1
+                CCCD_BACK: 1
+                CMCC: 1
+                CCCD_front_chip: 1
+                CCCD_back_chip: 1
+                CMQD_A: 1
+                CMQD_A_BACK: 1
+                CMQD_B: 1
+                CMQD_B_BACK: 1
+                CMQD_C: 1
+                CMQD_C_BACK: 1
+                CMQD_D: 1
+                CMQD_D_BACK: 1
+                CMQD_B_VT: 1
+                CMQD_B_VT_BACK: 1
+                PASSPORT: 1
+                PASSPORT_OTHER: 1
+              iou_threshold: 0.5
+              method: '''every_point_interpolation'''
+              print_detail_mAP: False
+              print_FP_files: False
           output_transform: 'lambda x: (x[0], x[1], x[2])'
     attach_to:
       train_evaluator: '''train'''
       valid_evaluator: '''valid'''
+
+writer:
+  module: flame.handlers.tensorboard
+  class: TensorBoard
+  TensorBoard:
+    logdir: '''checkpoint/birdview_vehicles/efficientdet-d0/'''
+
+logger:
+  module: flame.handlers.logger
+  class: Logger
+  Logger:
+    logdir: '''checkpoint/birdview_vehicles/efficientdet-d0/'''
+    logname: '''eKYC'''
 
 screenlogger:
   module: flame.handlers.screenlogger
@@ -238,7 +308,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN/'''
+    dirname: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -255,7 +325,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/NATCOM2/MaskRCNN_ResNet50_FPN/'''
+    dirname: '''checkpoint/eEKYC/maskrcnn_resnet50_fpn/'''
     save_interval: 1
     n_saved: 1
 

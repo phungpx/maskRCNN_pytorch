@@ -144,7 +144,7 @@ screenlogger:
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''train''' 
+      - '''train'''
       - '''valid'''
 
 history:
