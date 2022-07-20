@@ -17,9 +17,9 @@ class LabelmeDataset(Dataset):
     def __init__(
         self,
         dirnames: List[str] = None,
-        image_size: Optional[Tuple[int, int]] = None,
-        image_patterns: List[str] = ['*.jpg'],
-        label_patterns: List[str] = ['*.xml'],
+        image_size: Optional[Tuple[int, int]] = (800, 800),
+        image_patterns: List[str] = ['*.*g', '*.*G'],
+        label_patterns: List[str] = ['*.json'],
         classes: Dict[str, int] = None,
         mean: List[float] = [0., 0., 0.],
         std: List[float] = [1., 1., 1.],

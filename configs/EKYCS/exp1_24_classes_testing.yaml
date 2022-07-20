@@ -8,9 +8,9 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''../efficient_det_pytorch/dataset/EKYCs/train'''
-            - '''../efficient_det_pytorch/dataset/EKYCs/test'''
-            - '''../efficient_det_pytorch/dataset/EKYCs/valid'''
+            - '''dataset/eKYCs/train'''
+            - '''dataset/eKYCs/test'''
+            - '''dataset/eKYCs/valid'''
           classes:
             BLX: 1
             BLX_BACK: 2

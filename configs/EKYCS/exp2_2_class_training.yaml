@@ -4,40 +4,36 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.altheia_dataset
-        class: AltheiaDataset
-        AltheiaDataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
           dirnames:
-            - '''/dataset/EKYCs/train'''
+            - '''dataset/eKYCs/train'''
           classes:
             BLX: 1
-            BLX_BACK: 2
-            BLX_OLD: 3
-            BLX_BACK_OLD: 4
-            CMND: 5
-            CMND_BACK: 6
-            CCCD: 7
-            CCCD_BACK: 8
-            CMCC: 9
-            CCCD_front_chip: 10
-            CCCD_back_chip: 11
-            CMQD_A: 12
-            CMQD_A_BACK: 13
-            CMQD_B: 14
-            CMQD_B_BACK: 15
-            CMQD_C: 16
-            CMQD_C_BACK: 17
-            CMQD_D: 18
-            CMQD_D_BACK: 19
-            CMQD_B_VT: 20
-            CMQD_B_VT_BACK: 21
-            PASSPORT: 22
-            PASSPORT_OTHER: 23
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
-          mean: [0., 0., 0.]
-          std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.xml''']
           transforms:
             - iaa.MotionBlur()
             - iaa.ChangeColorTemperature()
@@ -62,40 +58,36 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.altheia_dataset
-        class: AltheiaDataset
-        AltheiaDataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
           dirnames:
-            - '''../efficient_det_pytorch/dataset/EKYCs/train'''
+            - '''dataset/eKYCs/train'''
           classes:
             BLX: 1
-            BLX_BACK: 2
-            BLX_OLD: 3
-            BLX_BACK_OLD: 4
-            CMND: 5
-            CMND_BACK: 6
-            CCCD: 7
-            CCCD_BACK: 8
-            CMCC: 9
-            CCCD_front_chip: 10
-            CCCD_back_chip: 11
-            CMQD_A: 12
-            CMQD_A_BACK: 13
-            CMQD_B: 14
-            CMQD_B_BACK: 15
-            CMQD_C: 16
-            CMQD_C_BACK: 17
-            CMQD_D: 18
-            CMQD_D_BACK: 19
-            CMQD_B_VT: 20
-            CMQD_B_VT_BACK: 21
-            PASSPORT: 22
-            PASSPORT_OTHER: 23
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
-          mean: [0., 0., 0.]
-          std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.xml''']
       batch_size: 8
       shuffle: False
       num_workers: 12
@@ -108,40 +100,36 @@ data:
     class: DataLoader
     DataLoader:
       dataset:
-        module: flame.core.data.altheia_dataset
-        class: AltheiaDataset
-        AltheiaDataset:
+        module: flame.core.data.labelme_dataset
+        class: LabelmeDataset
+        LabelmeDataset:
           dirnames:
-            - '''../efficient_det_pytorch/dataset/EKYCs/valid'''
+            - '''dataset/eKYCs/valid'''
           classes:
             BLX: 1
-            BLX_BACK: 2
-            BLX_OLD: 3
-            BLX_BACK_OLD: 4
-            CMND: 5
-            CMND_BACK: 6
-            CCCD: 7
-            CCCD_BACK: 8
-            CMCC: 9
-            CCCD_front_chip: 10
-            CCCD_back_chip: 11
-            CMQD_A: 12
-            CMQD_A_BACK: 13
-            CMQD_B: 14
-            CMQD_B_BACK: 15
-            CMQD_C: 16
-            CMQD_C_BACK: 17
-            CMQD_D: 18
-            CMQD_D_BACK: 19
-            CMQD_B_VT: 20
-            CMQD_B_VT_BACK: 21
-            PASSPORT: 22
-            PASSPORT_OTHER: 23
+            BLX_BACK: 1
+            BLX_OLD: 1
+            BLX_BACK_OLD: 1
+            CMND: 1
+            CMND_BACK: 1
+            CCCD: 1
+            CCCD_BACK: 1
+            CMCC: 1
+            CCCD_front_chip: 1
+            CCCD_back_chip: 1
+            CMQD_A: 1
+            CMQD_A_BACK: 1
+            CMQD_B: 1
+            CMQD_B_BACK: 1
+            CMQD_C: 1
+            CMQD_C_BACK: 1
+            CMQD_D: 1
+            CMQD_D_BACK: 1
+            CMQD_B_VT: 1
+            CMQD_B_VT_BACK: 1
+            PASSPORT: 1
+            PASSPORT_OTHER: 1
           image_size: (800, 800)
-          mean: [0., 0., 0.]
-          std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.xml''']
       batch_size: 8
       shuffle: False
       num_workers: 12
@@ -162,12 +150,12 @@ loss:
     output_transform: 'lambda x: x'
 
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
-  class: MaskRCNNResNet50FPNV2
-  MaskRCNNResNet50FPNV2:
-    pretrained: False
-    backbone_pretrained: True
-    num_classes: 24
+  module: flame.core.model.maskrcnn_resnet50_fpn
+  class: MaskrcnnResnet50FPN
+  MaskrcnnResnet50FPN:
+    pretrained: True
+    pretrained_backbone: False
+    num_classes: 2
     # Anchors parameters
     anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
     aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
@@ -204,50 +192,37 @@ valid_evaluator:
     device: '''cuda'''
 
 metrics:
-  module: flame.handlers.metrics.metrics
+  module: flame.handlers.metric_evaluator
   class: Metrics
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.evaluator
-        class: Evaluator
-        Evaluator:
-          eval_fn:
-            module: flame.core.metric.mAP
-            class: MeanAveragePrecision
-            MeanAveragePrecision:
-              classes:
-                BLX: 1
-                BLX_BACK: 2
-                BLX_OLD: 3
-                BLX_BACK_OLD: 4
-                CMND: 5
-                CMND_BACK: 6
-                CCCD: 7
-                CCCD_BACK: 8
-                CMCC: 9
-                CCCD_front_chip: 10
-                CCCD_back_chip: 11
-                CMQD_A: 12
-                CMQD_A_BACK: 13
-                CMQD_B: 14
-                CMQD_B_BACK: 15
-                CMQD_C: 16
-                CMQD_C_BACK: 17
-                CMQD_D: 18
-                CMQD_D_BACK: 19
-                CMQD_B_VT: 20
-                CMQD_B_VT_BACK: 21
-                PASSPORT: 22
-                PASSPORT_OTHER: 23
-              iou_threshold: 0.5
-              method: '''every_point_interpolation'''
-              print_detail_mAP: False
-              print_FP_files: False
+        module: flame.core.metric.mAP
+        class: mAP
+        mAP:
+          classes:
+            CARD: 1
+          iou_threshold: 0.5
+          method: '''every_point_interpolation'''
+          print_detail_mAP: False
+          print_FP_files: False
           output_transform: 'lambda x: (x[0], x[1], x[2])'
     attach_to:
       train_evaluator: '''train'''
       valid_evaluator: '''valid'''
+
+writer:
+  module: flame.handlers.tensorboard
+  class: TensorBoard
+  TensorBoard:
+    logdir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn'''
+
+logger:
+  module: flame.handlers.logger
+  class: Logger
+  Logger:
+    logdir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn'''
+    logname: '''eKYC'''
 
 screenlogger:
   module: flame.handlers.screenlogger
@@ -295,7 +270,7 @@ best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'''
+    dirname: '''checkpoint/eKYC/maskrcnn_resnet50_fpn'''
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     n_saved: 1
@@ -312,7 +287,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'''
+    dirname: '''checkpoint/eKYC/maskrcnn_resnet50_fpn'''
     save_interval: 1
     n_saved: 1
 
