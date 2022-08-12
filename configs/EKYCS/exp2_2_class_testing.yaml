@@ -36,7 +36,7 @@ data:
             PASSPORT: 1
             PASSPORT_OTHER: 1
           image_size: (800, 800)
-      batch_size: 2
+      batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -62,8 +62,8 @@ metrics:
         class: COCOEvaluator
         COCOEvaluator:
           image_size: (800, 800)
-          detection_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2104131340/eEKYC_det_val.json'''
-          ground_truth_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2104131340/eEKYC_gt_val.json'''
+          detection_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2207201241/eEKYC_det_val.json'''
+          ground_truth_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2207201241/eEKYC_gt_val.json'''
           classes:
             CARD: 1
           output_transform: 'lambda x: (x[0], x[1], x[2])'
@@ -74,7 +74,7 @@ logger:
   module: flame.handlers.logger
   class: Logger
   Logger:
-    logdir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2104131340/'''
+    logdir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2207201241/'''
     logname: '''eKYC'''
     run_mode: '''testing'''
 
@@ -89,7 +89,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2104131340/best_model_27_mAP=0.9981.pt'''
+    checkpoint_path: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2207201241/best_model_7_mAP=0.9932.pt'''
     mode: '''test'''
 
 predictor:
@@ -97,7 +97,7 @@ predictor:
   class: Predictor
   Predictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2104131340/best_model_27_mAP=0.9981/'''
+    output_dir: '''checkpoint/eKYC/maskrcnn_resnet50_fpn/2207201241/best_model_7_mAP=0.9932/'''
     classes:
       CARD: [[0, 255, 0], 1]
     alpha: 0.3
