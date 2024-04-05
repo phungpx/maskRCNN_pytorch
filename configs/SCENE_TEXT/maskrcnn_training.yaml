@@ -8,18 +8,19 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
-            - '''dataset/SCENE_TEXT/totaltext/train'''
-            - '''dataset/SCENE_TEXT/TD500/train'''
+            - "'dataset/SCENE_TEXT/focused_scene_text_2013/train'"
+            - "'dataset/SCENE_TEXT/icdar_2011/train'"
+            - "'dataset/SCENE_TEXT/incidental_scene_text_2015/train'"
+            - "'dataset/SCENE_TEXT/totaltext/train'"
+            - "'dataset/SCENE_TEXT/TD500/train'"
           classes:
             word: 1
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.json''']
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          label_patterns: ["'*.json'"]
           transforms:
             - iaa.MotionBlur()
             # - iaa.ChangeColorTemperature()
@@ -37,7 +38,7 @@ data:
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
   train_eval:
     module: torch.utils.data
@@ -48,24 +49,25 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/SCENE_TEXT/focused_scene_text_2013/train'''
-            - '''dataset/SCENE_TEXT/icdar_2011/train'''
-            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/train'''
-            - '''dataset/SCENE_TEXT/totaltext/train'''
-            - '''dataset/SCENE_TEXT/TD500/train'''
+            - "'dataset/SCENE_TEXT/focused_scene_text_2013/train'"
+            - "'dataset/SCENE_TEXT/icdar_2011/train'"
+            - "'dataset/SCENE_TEXT/incidental_scene_text_2015/train'"
+            - "'dataset/SCENE_TEXT/totaltext/train'"
+            - "'dataset/SCENE_TEXT/TD500/train'"
           classes:
             word: 1
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.json''']
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          label_patterns: ["'*.json'"]
       batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
   valid:
     module: torch.utils.data
@@ -76,26 +78,27 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/SCENE_TEXT/focused_scene_text_2013/test'''
-            - '''dataset/SCENE_TEXT/incidental_scene_text_2015/test'''
-            - '''dataset/SCENE_TEXT/totaltext/valid'''
-            - '''dataset/SCENE_TEXT/TD500/test'''
+            - "'dataset/SCENE_TEXT/focused_scene_text_2013/test'"
+            - "'dataset/SCENE_TEXT/incidental_scene_text_2015/test'"
+            - "'dataset/SCENE_TEXT/totaltext/valid'"
+            - "'dataset/SCENE_TEXT/TD500/test'"
           classes:
             word: 1
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.json''']
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          label_patterns: ["'*.json'"]
       batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  module: flame.core.modelmodels.based_maskrcnn_resnet50_fpn_v2
   class: MaskRCNNResNet50FPNV2
   MaskRCNNResNet50FPNV2:
     pretrained: False
@@ -122,14 +125,14 @@ train_evaluator:
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['train_eval']
-    device: '''cuda'''
+    device: "'cuda'"
 
 valid_evaluator:
   module: flame.handlers.metric_evaluator
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['valid']
-    device: '''cuda'''
+    device: "'cuda'"
 
 metrics:
   module: flame.handlers.metrics.metrics
@@ -148,19 +151,19 @@ metrics:
                 word: 1
               iou_threshold: 0.5
               verbose: False
-              method: '''every_point_interpolation'''
-          output_transform: 'lambda x: (x[0], x[1])'
+              method: "'every_point_interpolation'"
+          output_transform: "lambda x: (x[0], x[1])"
     attach_to:
-      train_evaluator: '''train'''
-      valid_evaluator: '''valid'''
+      train_evaluator: "'train'"
+      valid_evaluator: "'valid'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''train''' 
-      - '''valid'''
+      - "'train'"
+      - "'valid'"
 
 history:
   module: flame.handlers.checkpoint
@@ -170,8 +173,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
-    mode: '''train'''
+    checkpoint_path: "''"
+    mode: "'train'"
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -181,9 +184,9 @@ lr_scheduler:
   module: flame.handlers.lr_scheduler
   class: ReduceLROnPlateau
   ReduceLROnPlateau:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 5
     verbose: True
 
@@ -191,18 +194,18 @@ early_stopping:
   module: flame.handlers.early_stopping
   class: EarlyStopping
   EarlyStopping:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 10
 
 best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'''
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
+    dirname: "'checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'"
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
     n_saved: 1
 
 backup_saver:
@@ -210,14 +213,14 @@ backup_saver:
   class: BackupSaver
   BackupSaver:
     modules:
-      - '''model'''
-      - '''optim'''
-      - '''backup_saver'''
-      - '''best_saver'''
-      - '''history'''
-      - '''lr_scheduler'''
-      - '''early_stopping'''
-    dirname: '''checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'''
+      - "'model'"
+      - "'optim'"
+      - "'backup_saver'"
+      - "'best_saver'"
+      - "'history'"
+      - "'lr_scheduler'"
+      - "'early_stopping'"
+    dirname: "'checkpoint/SCENE_TEXT/maskrcnn_resnet50fpn_v2/totaltext/'"
     save_interval: 1
     n_saved: 1
 
@@ -226,7 +229,7 @@ engine:
   class: Trainer
   Trainer:
     dataset: config['data']['train']
-    device: '''cuda'''
+    device: "'cuda'"
     max_epochs: 10000
 
 extralibs:

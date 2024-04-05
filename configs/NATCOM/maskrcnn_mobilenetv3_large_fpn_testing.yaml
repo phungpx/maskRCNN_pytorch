@@ -8,34 +8,34 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train'''
-            - '''dataset/NATCOM2/test'''
-            - '''dataset/NATCOM2/valid'''
+            - "'dataset/NATCOM2/train'"
+            - "'dataset/NATCOM2/test'"
+            - "'dataset/NATCOM2/valid'"
           classes:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          image_patterns: ["'*.*g'", "'*.*G'"]
+          label_patterns: ["'*.json'"]
       batch_size: 16
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 model:
-  module: flame.core.model.maskrcnn_mobilenetv3_large_fpn
+  module: flame.core.modelmodels.based_maskrcnn_mobilenetv3_large_fpn
   class: MaskRCNNMobileNetV3LargeFPN
   MaskRCNNMobileNetV3LargeFPN:
     # pretrained: False
     backbone_pretrained: True
     num_classes: 3
     # Anchors parameters
-    anchor_sizes: '((16, 32, 64, 128, 256,),) * 3'
-    aspect_ratios: '((0.5, 1.0, 2.0),) * 3'
+    anchor_sizes: "((16, 32, 64, 128, 256,),) * 3"
+    aspect_ratios: "((0.5, 1.0, 2.0),) * 3"
     # Box parameters
     box_score_thresh: 0.2
     box_nms_thresh: 0.2
@@ -50,35 +50,35 @@ metrics:
         class: COCOEvaluator
         COCOEvaluator:
           image_size: None
-          detection_path: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/NATCOM_det_val.json'''
-          ground_truth_path: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/NATCOM_gt_val.json'''
+          detection_path: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/NATCOM_det_val.json'"
+          ground_truth_path: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/NATCOM_gt_val.json'"
           classes:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
-          output_transform: 'lambda x: (x[0], x[1], x[2])'
+          output_transform: "lambda x: (x[0], x[1], x[2])"
     attach_to:
-      engine: '''test'''
+      engine: "'test'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''test'''
+      - "'test'"
 
 checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/best_model_5_mAP=0.9978.pt'''
-    mode: '''test'''
+    checkpoint_path: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/best_model_5_mAP=0.9978.pt'"
+    mode: "'test'"
 
 predictor:
   module: flame.handlers.predictor
   class: Predictor
   Predictor:
-    evaluator_name: '''engine'''
-    output_dir: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/best_model_5_mAP=0.9978/'''
+    evaluator_name: "'engine'"
+    output_dir: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/2205261026/best_model_5_mAP=0.9978/'"
     classes:
       CARD_BACK_TYPE_1: [[0, 255, 0], 1]
       CARD_FRONT_TYPE_1: [[255, 0, 0], 2]
@@ -87,14 +87,14 @@ predictor:
     draw_box: True
     image_size: None
     use_pad_to_square: True
-    output_transform: 'lambda x: (x[0], x[-1])'
+    output_transform: "lambda x: (x[0], x[-1])"
 
 engine:
   module: flame.core.engine.engine
   class: Evaluator
   Evaluator:
     dataset: config['data']['test']
-    device: '''cuda'''
+    device: "'cuda'"
 
 extralibs:
   torch: torch

@@ -8,9 +8,9 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/train'''
-            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/test'''
-            - '''/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/valid'''
+            - "'/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/train'"
+            - "'/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/test'"
+            - "'/extdata/ocr/phungpx/projects/PHUNGPX/object_detection_pytorch/efficient_det_pytorch/dataset/EPASS/valid'"
           classes:
             EPASS_TYPE_1: 1
             EPASS_TYPE_2: 1
@@ -21,17 +21,18 @@ data:
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.json''']
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          label_patterns: ["'*.json'"]
       batch_size: 16
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  module: flame.core.modelmodels.based_maskrcnn_resnet50_fpn_v2
   class: MaskRCNNResNet50FPNV2
   MaskRCNNResNet50FPNV2:
     pretrained: False
@@ -62,31 +63,31 @@ metrics:
                 V_SERIAL: 2
               iou_threshold: 0.5
               verbose: True
-              method: '''every_point_interpolation'''
-          output_transform: 'lambda x: (x[0], x[1])'
+              method: "'every_point_interpolation'"
+          output_transform: "lambda x: (x[0], x[1])"
     attach_to:
-      engine: '''test'''
+      engine: "'test'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''test'''
+      - "'test'"
 
 checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931.pt'''
-    mode: '''test'''
+    checkpoint_path: "'checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931.pt'"
+    mode: "'test'"
 
 predictor:
   module: flame.handlers.predictor
   class: Predictor
   Predictor:
-    evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931/'''
+    evaluator_name: "'engine'"
+    output_dir: "'checkpoint/EPASS/MaskRCNN_ResNet50_FPN_V2/2204260932/best_model_77_mAP=0.9931/'"
     classes:
       EPASS: [[0, 255, 0], 1]
       V_SERIAL: [[255, 0, 0], 2]
@@ -95,14 +96,14 @@ predictor:
     draw_box: True
     image_size: (800, 800)
     use_pad_to_square: True
-    output_transform: 'lambda x: (x[0], x[-1])'
+    output_transform: "lambda x: (x[0], x[-1])"
 
 engine:
   module: flame.core.engine.engine
   class: Evaluator
   Evaluator:
     dataset: config['data']['test']
-    device: '''cuda'''
+    device: "'cuda'"
 
 extralibs:
   torch: torch

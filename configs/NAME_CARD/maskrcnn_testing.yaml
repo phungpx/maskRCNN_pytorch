@@ -8,23 +8,24 @@ data:
         class: AltheiaDataset
         AltheiaDataset:
           dirnames:
-            - '''dataset/NAME_CARD/test'''
+            - "'dataset/NAME_CARD/test'"
           classes:
             CARD_VISIT: 1
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.jpg''', '''*.png''', '''*.jpeg''', '''*.JPG''', '''*.PNG''', '''*.JPEG''']
-          label_patterns: ['''*.xml''']
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          label_patterns: ["'*.xml'"]
       batch_size: 4
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 model:
-  module: flame.core.model.maskrcnn
+  module: flame.core.modelmodels.based_maskrcnn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     num_classes: 2
@@ -50,31 +51,31 @@ metrics:
                 CARD_VISIT: 1
               iou_threshold: 0.5
               verbose: True
-              method: '''every_point_interpolation'''
-          output_transform: 'lambda x: (x[0], x[1])'
+              method: "'every_point_interpolation'"
+          output_transform: "lambda x: (x[0], x[1])"
     attach_to:
-      engine: '''test'''
+      engine: "'test'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''test'''
+      - "'test'"
 
 checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110271448/best_model_17_mAP=0.9910.pt'''
-    mode: '''test'''
+    checkpoint_path: "'checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110271448/best_model_17_mAP=0.9910.pt'"
+    mode: "'test'"
 
 predictor:
   module: flame.handlers.mask_predictor
   class: MaskPredictor
   MaskPredictor:
-    evaluator_name: '''engine'''
-    output_dir: '''checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110271448/best_model_17_mAP=0.9910/test'''
+    evaluator_name: "'engine'"
+    output_dir: "'checkpoint/CARD_VISIT/maskrcnn_resnet50fpn/2110271448/best_model_17_mAP=0.9910/test'"
     classes:
       CARD_VISIT: [[0, 255, 0], 1]
     alpha: 0.3
@@ -82,14 +83,14 @@ predictor:
     # score_threshold: 0.4
     # iou_threshold: 0.5
     use_pad_to_square: True
-    output_transform: 'lambda x: (x[0], x[-1])'
+    output_transform: "lambda x: (x[0], x[-1])"
 
 engine:
   module: flame.core.engine.engine
   class: Evaluator
   Evaluator:
     dataset: config['data']['test']
-    device: '''cuda'''
+    device: "'cuda'"
 
 extralibs:
   torch: torch

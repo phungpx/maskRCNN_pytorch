@@ -8,15 +8,15 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train/'''
+            - "'dataset/NATCOM2/train/'"
           classes:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          image_patterns: ["'*.*g'", "'*.*G'"]
+          label_patterns: ["'*.json'"]
           transforms:
             - iaa.MotionBlur()
             - iaa.ChangeColorTemperature()
@@ -34,8 +34,8 @@ data:
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+      collate_fn: "lambda batch:tuple(zip(*batch))"
+
   train_eval:
     module: torch.utils.data
     class: DataLoader
@@ -45,22 +45,22 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/train/'''
+            - "'dataset/NATCOM2/train/'"
           classes:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          image_patterns: ["'*.*g'", "'*.*G'"]
+          label_patterns: ["'*.json'"]
       batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+      collate_fn: "lambda batch:tuple(zip(*batch))"
+
   valid:
     module: torch.utils.data
     class: DataLoader
@@ -70,21 +70,21 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/NATCOM2/valid/'''
+            - "'dataset/NATCOM2/valid/'"
           classes:
             CARD_BACK_TYPE_1: 1
             CARD_FRONT_TYPE_1: 2
           image_size: None
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          image_patterns: ["'*.*g'", "'*.*G'"]
+          label_patterns: ["'*.json'"]
       batch_size: 8
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 loss:
   module: flame.core.loss.aggregated_loss
@@ -96,18 +96,18 @@ loss:
     rpn_cls_weight: 1.
     rpn_reg_weight: 1.
     mask_weight: 1.
-    output_transform: 'lambda x: x'
+    output_transform: "lambda x: x"
 
 model:
-  module: flame.core.model.maskrcnn_mobilenetv3_large_fpn
+  module: flame.core.modelmodels.based_maskrcnn_mobilenetv3_large_fpn
   class: MaskRCNNMobileNetV3LargeFPN
   MaskRCNNMobileNetV3LargeFPN:
     # pretrained: False
     backbone_pretrained: True
     num_classes: 3
     # Anchors parameters
-    anchor_sizes: '((16,), (32,), (64,), (128,), (256,))'
-    aspect_ratios: '((0.5, 1.0, 2.0),) * 5'
+    anchor_sizes: "((16,), (32,), (64,), (128,), (256,))"
+    aspect_ratios: "((0.5, 1.0, 2.0),) * 5"
     # Box parameters
     box_score_thresh: 0.2
     box_nms_thresh: 0.2
@@ -131,14 +131,14 @@ train_evaluator:
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['train_eval']
-    device: '''cuda'''
+    device: "'cuda'"
 
 valid_evaluator:
   module: flame.handlers.metric_evaluator
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['valid']
-    device: '''cuda'''
+    device: "'cuda'"
 
 metrics:
   module: flame.handlers.metrics.metrics
@@ -157,21 +157,21 @@ metrics:
                 CARD_BACK_TYPE_1: 1
                 CARD_FRONT_TYPE_1: 2
               iou_threshold: 0.5
-              method: '''every_point_interpolation'''
+              method: "'every_point_interpolation'"
               print_detail_mAP: False
               print_FP_files: False
-          output_transform: 'lambda x: (x[0], x[1], x[2])'
+          output_transform: "lambda x: (x[0], x[1], x[2])"
     attach_to:
-      train_evaluator: '''train'''
-      valid_evaluator: '''valid'''
+      train_evaluator: "'train'"
+      valid_evaluator: "'valid'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''train''' 
-      - '''valid'''
+      - "'train'"
+      - "'valid'"
 
 history:
   module: flame.handlers.checkpoint
@@ -181,8 +181,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
-    mode: '''train'''
+    checkpoint_path: "''"
+    mode: "'train'"
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -192,9 +192,9 @@ lr_scheduler:
   module: flame.handlers.lr_scheduler
   class: ReduceLROnPlateau
   ReduceLROnPlateau:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 5
     verbose: True
 
@@ -202,18 +202,18 @@ early_stopping:
   module: flame.handlers.early_stopping
   class: EarlyStopping
   EarlyStopping:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 50
 
 best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/'''
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
+    dirname: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/'"
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
     n_saved: 1
 
 backup_saver:
@@ -221,14 +221,14 @@ backup_saver:
   class: BackupSaver
   BackupSaver:
     modules:
-      - '''model'''
-      - '''optim'''
-      - '''backup_saver'''
-      - '''best_saver'''
-      - '''history'''
-      - '''lr_scheduler'''
-      - '''early_stopping'''
-    dirname: '''checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/'''
+      - "'model'"
+      - "'optim'"
+      - "'backup_saver'"
+      - "'best_saver'"
+      - "'history'"
+      - "'lr_scheduler'"
+      - "'early_stopping'"
+    dirname: "'checkpoint/NATCOM2/maskrcnn_mobilenetv3_large_fpn/'"
     save_interval: 1
     n_saved: 1
 
@@ -237,7 +237,7 @@ engine:
   class: Trainer
   Trainer:
     dataset: config['data']['train']
-    device: '''cuda'''
+    device: "'cuda'"
     max_epochs: 10000
 
 extralibs:

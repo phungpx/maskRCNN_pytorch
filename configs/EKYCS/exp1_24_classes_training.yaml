@@ -8,7 +8,7 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''/dataset/eKYCs/train'''
+            - "'/dataset/eKYCs/train'"
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -50,8 +50,8 @@ data:
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+      collate_fn: "lambda batch:tuple(zip(*batch))"
+
   train_eval:
     module: torch.utils.data
     class: DataLoader
@@ -61,7 +61,7 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/eKYCs/train'''
+            - "'dataset/eKYCs/train'"
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -91,8 +91,8 @@ data:
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
-  
+      collate_fn: "lambda batch:tuple(zip(*batch))"
+
   valid:
     module: torch.utils.data
     class: DataLoader
@@ -102,7 +102,7 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/eKYCs/valid'''
+            - "'dataset/eKYCs/valid'"
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -132,7 +132,7 @@ data:
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 loss:
   module: flame.core.loss.aggregated_loss
@@ -144,10 +144,10 @@ loss:
     rpn_cls_weight: 1.
     rpn_reg_weight: 1.
     mask_weight: 1.
-    output_transform: 'lambda x: x'
+    output_transform: "lambda x: x"
 
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn
+  module: flame.core.modelmodels.based_maskrcnn_resnet50_fpn
   class: MaskrcnnResnet50FPN
   MaskrcnnResnet50FPN:
     pretrained: True
@@ -179,14 +179,14 @@ train_evaluator:
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['train_eval']
-    device: '''cuda'''
+    device: "'cuda'"
 
 valid_evaluator:
   module: flame.handlers.metric_evaluator
   class: MetricEvaluator
   MetricEvaluator:
     dataset: config['data']['valid']
-    device: '''cuda'''
+    device: "'cuda'"
 
 metrics:
   module: flame.handlers.metrics.metrics
@@ -226,21 +226,21 @@ metrics:
                 PASSPORT: 22
                 PASSPORT_OTHER: 23
               iou_threshold: 0.5
-              method: '''every_point_interpolation'''
+              method: "'every_point_interpolation'"
               print_detail_mAP: False
               print_FP_files: False
-          output_transform: 'lambda x: (x[0], x[1], x[2])'
+          output_transform: "lambda x: (x[0], x[1], x[2])"
     attach_to:
-      train_evaluator: '''train'''
-      valid_evaluator: '''valid'''
+      train_evaluator: "'train'"
+      valid_evaluator: "'valid'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''train''' 
-      - '''valid'''
+      - "'train'"
+      - "'valid'"
 
 history:
   module: flame.handlers.checkpoint
@@ -250,8 +250,8 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
-    mode: '''train'''
+    checkpoint_path: "''"
+    mode: "'train'"
 
 terminate_on_nan:
   module: flame.handlers.terminate_on_nan
@@ -261,9 +261,9 @@ lr_scheduler:
   module: flame.handlers.lr_scheduler
   class: ReduceLROnPlateau
   ReduceLROnPlateau:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 10
     verbose: True
 
@@ -271,18 +271,18 @@ early_stopping:
   module: flame.handlers.early_stopping
   class: EarlyStopping
   EarlyStopping:
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
-    mode: '''max'''
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
+    mode: "'max'"
     patience: 20
 
 best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'''
-    score_name: '''mAP'''
-    evaluator_name: '''valid_evaluator'''
+    dirname: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'"
+    score_name: "'mAP'"
+    evaluator_name: "'valid_evaluator'"
     n_saved: 1
 
 backup_saver:
@@ -290,14 +290,14 @@ backup_saver:
   class: BackupSaver
   BackupSaver:
     modules:
-      - '''model'''
-      - '''optim'''
-      - '''backup_saver'''
-      - '''best_saver'''
-      - '''history'''
-      - '''lr_scheduler'''
-      - '''early_stopping'''
-    dirname: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'''
+      - "'model'"
+      - "'optim'"
+      - "'backup_saver'"
+      - "'best_saver'"
+      - "'history'"
+      - "'lr_scheduler'"
+      - "'early_stopping'"
+    dirname: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/'"
     save_interval: 1
     n_saved: 1
 
@@ -306,7 +306,7 @@ engine:
   class: Trainer
   Trainer:
     dataset: config['data']['train']
-    device: '''cuda'''
+    device: "'cuda'"
     max_epochs: 10000
 
 extralibs:

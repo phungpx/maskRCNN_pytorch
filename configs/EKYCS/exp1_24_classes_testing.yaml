@@ -8,9 +8,9 @@ data:
         class: LabelmeDataset
         LabelmeDataset:
           dirnames:
-            - '''dataset/eKYCs/train'''
-            - '''dataset/eKYCs/test'''
-            - '''dataset/eKYCs/valid'''
+            - "'dataset/eKYCs/train'"
+            - "'dataset/eKYCs/test'"
+            - "'dataset/eKYCs/valid'"
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -38,17 +38,17 @@ data:
           image_size: (800, 800)
           mean: [0., 0., 0.]
           std: [1., 1., 1.]
-          image_patterns: ['''*.*g''', '''*.*G''']
-          label_patterns: ['''*.json''']
+          image_patterns: ["'*.*g'", "'*.*G'"]
+          label_patterns: ["'*.json'"]
       batch_size: 16
       shuffle: False
       num_workers: 12
       pin_memory: True
       drop_last: False
-      collate_fn: 'lambda batch:tuple(zip(*batch))'
+      collate_fn: "lambda batch:tuple(zip(*batch))"
 
 model:
-  module: flame.core.model.maskrcnn_resnet50_fpn_v2
+  module: flame.core.modelmodels.based_maskrcnn_resnet50_fpn_v2
   class: MaskRCNNResNet50FPNV2
   MaskRCNNResNet50FPNV2:
     pretrained: False
@@ -71,8 +71,8 @@ metrics:
         class: COCOEvaluator
         COCOEvaluator:
           image_size: (800, 800)
-          detection_path: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCs_det_val.json'''
-          ground_truth_path: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCs_gt_val.json'''
+          detection_path: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCs_det_val.json'"
+          ground_truth_path: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCs_gt_val.json'"
           classes:
             BLX: 1
             BLX_BACK: 2
@@ -97,30 +97,30 @@ metrics:
             CMQD_B_VT_BACK: 21
             PASSPORT: 22
             PASSPORT_OTHER: 23
-          output_transform: 'lambda x: (x[0], x[1], x[2])'
+          output_transform: "lambda x: (x[0], x[1], x[2])"
     attach_to:
-      engine: '''test'''
+      engine: "'test'"
 
 screenlogger:
   module: flame.handlers.screenlogger
   class: ScreenLogger
   ScreenLogger:
     eval_names:
-      - '''test'''
+      - "'test'"
 
 checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCsodel_34_mAP=0.9974.pt'''
-    mode: '''test'''
+    checkpoint_path: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCsodel_34_mAP=0.9974.pt'"
+    mode: "'test'"
 
 predictor:
   module: flame.handlers.predictor
   class: Predictor
   Predictor:
-    evaluator_name: '''engine'''
-    output_dir: '''checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCsodel_34_mAP=0.9974/'''
+    evaluator_name: "'engine'"
+    output_dir: "'checkpoint/EKYCs/MaskRCNN_ResNet50_FPN_V2/2205251005/EKYCsodel_34_mAP=0.9974/'"
     classes:
       BLX: [[0, 255, 0], 1]
       BLX_BACK: [[255, 255, 0], 2]
@@ -150,14 +150,14 @@ predictor:
     draw_box: True
     image_size: (800, 800)
     use_pad_to_square: True
-    output_transform: 'lambda x: (x[0], x[-1])'
+    output_transform: "lambda x: (x[0], x[-1])"
 
 engine:
   module: flame.core.engine.engine
   class: Evaluator
   Evaluator:
     dataset: config['data']['test']
-    device: '''cuda'''
+    device: "'cuda'"
 
 extralibs:
   torch: torch
