@@ -35,7 +35,7 @@ data:
             - iaa.Pad(percent=(0, 0.1), keep_size=False)
             - iaa.Rot90(k=[0, 1, 2, 3], keep_size=False)
             - iaa.Affine(rotate=(0, 360), shear=(-2, 2), fit_output=True)
-      batch_size: 4
+      batch_size: 2
       shuffle: True
       num_workers: 12
       pin_memory: True
@@ -66,7 +66,7 @@ data:
           image_patterns:
             ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
           label_patterns: ["'*.json'"]
-      batch_size: 4
+      batch_size: 2
       shuffle: False
       num_workers: 12
       pin_memory: True
@@ -97,7 +97,7 @@ data:
           image_patterns:
             ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
           label_patterns: ["'*.json'"]
-      batch_size: 4
+      batch_size: 2
       shuffle: False
       num_workers: 12
       pin_memory: True
