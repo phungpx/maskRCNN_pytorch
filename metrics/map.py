@@ -271,21 +271,6 @@ class MeanAveragePrecision(nn.Module):
             ]
         )
 
-        for result in results:
-            average_precisions.append(result["average_precision"])
-            average_precision_stats.add_row(
-                [
-                    result["class_name"],
-                    result["total_TP"],
-                    result["total_FP"],
-                    result["total_groundtruths"],
-                    result["total_detections"],
-                    round(result["average_precision"], 4),
-                ]
-            )
-
-        print(average_precision_stats)
-
         mAP = (
             sum(average_precisions) / len(average_precisions)
             if len(average_precisions)
@@ -301,6 +286,21 @@ class MeanAveragePrecision(nn.Module):
             print(FP_file_stats)
 
         if self.print_detail_mAP:
+            for result in results:
+                average_precisions.append(result["average_precision"])
+                average_precision_stats.add_row(
+                    [
+                        result["class_name"],
+                        result["total_TP"],
+                        result["total_FP"],
+                        result["total_groundtruths"],
+                        result["total_detections"],
+                        round(result["average_precision"], 4),
+                    ]
+                )
+
+            print(average_precision_stats)
+
             return mAP, results
 
         return mAP
